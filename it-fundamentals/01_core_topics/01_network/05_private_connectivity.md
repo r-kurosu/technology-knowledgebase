@@ -1,0 +1,37 @@
+# 閉域接続
+
+## 1. 概念理解
+
+### 学ぶ範囲
+
+拠点間接続、専用線、サービスへのプライベート接続、VPC間接続、経路制御。
+
+## 2. 選択肢の比較
+
+<!-- VPN/Direct Connect、VPC Peering/Transit Gateway、Public Endpoint/PrivateLinkを比較する -->
+
+## 3. AWSでの実装例
+
+Site-to-Site VPN、Direct Connect、VPC Peering、Transit Gateway、PrivateLink、VPC Endpoint。
+
+## 4. アーキテクチャ図
+
+<!-- オンプレミス、複数VPC、AWSサービス間の接続をMermaidで表す -->
+
+## 5. 設計トレードオフ
+
+<!-- セキュリティ、帯域、安定性、導入時間、経路の複雑さ、コストを考える -->
+
+## 6. 自分の言葉で説明
+
+<!-- 「なぜインターネット経由にしないか」「各接続方式の違い」を説明する -->
+
+## 7. 理解確認
+
+### 到達目標
+
+接続対象と要件からVPN、専用線、VPC間接続、サービス接続を使い分けられる。
+
+### 現在の理解度
+
+<!-- A：説明できる / B：見れば分かる / C：まだ怪しい -->
