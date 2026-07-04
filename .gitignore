@@ -5,3 +5,6 @@ Thumbs.db
 *.swp
 *~
 .obsidian/
+
+# Claude Code local (personal) settings — never commit
+.claude/settings.local.json
