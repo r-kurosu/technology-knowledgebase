@@ -1,0 +1,176 @@
+# OpenAI vs Anthropic 比較まとめ
+
+実務でどちらを使うか判断するための比較ノート。
+
+---
+
+## 1. API構造の比較
+
+| 項目 | OpenAI | Anthropic |
+|---|---|---|
+| **APIエンドポイント** | `/v1/chat/completions` | `/v1/messages` |
+| **システムプロンプト** | `{"role": "system", ...}` | `system: "..."` (トップレベル) |
+| **ロール** | system / user / assistant / tool | user / assistant (+ tool) |
+| **マルチターン** | `messages` リストに追加 | 同じ |
+| **ストリーミング** | `stream=True` | `stream=True` |
+| **最大トークン** | `max_tokens` / `max_completion_tokens` | `max_tokens` |
+
+---
+
+## 2. プロンプト設計の共通点
+
+**ほとんどの原則は共通**。以下はどちらにも当てはまる:
+
+- 明確で具体的な指示を書く
+- Few-shotで例を示す（3〜5個が最適）
+- Confidence-basedな指示（「自信があるときだけ」）は機能しない
+- 複雑なタスクはPrompt Chainingで分割する
+- 構造化出力はスキーマ強制を使う（プロンプトだけに頼らない）
+- リトライ時は具体的なエラー情報を含める
+- プロンプトインジェクション対策は多層防御
+
+---
+
+## 3. プロンプト設計の相違点
+
+| 項目 | OpenAI / GPT | Anthropic / Claude |
+|---|---|---|
+| **区切り文字の推奨** | `---`, `"""`, Markdownなど | **XMLタグが特に推奨**（ファインチューニングで強化） |
+| **CoTプロンプト** | 通常モデルには有効 | 通常モデルには有効 |
+| **推論モデルのCoT** | o1/o3には不要（内部でThinking） | Claudeの拡張思考(`budget_tokens`/`effort`)は別途オプション |
+| **Few-shotの形式** | user/assistantのターンとして渡す | `<example>`タグで囲む方式が推奨 |
+| **Prefill** | アシスタントメッセージの先頭を指定できない | 以前は可能だったが4.6以降は非推奨 |
+| **Roleplay/人格設定** | system promptで定義 | system promptで定義（Claudeは「Character play」として詳細ガイドあり） |
+
+---
+
+## 4. 構造化出力の比較
+
+| 項目 | OpenAI | Anthropic |
+|---|---|---|
+| **推奨方式** | Structured Outputs (`response_format` + `strict: true`) | `output_config.format` (json_schema) |
+| **Python SDK** | `client.beta.chat.completions.parse()` + Pydantic | `client.messages.create()` + Pydantic |
+| **JSON mode** | あり（スキーマ保証なし） | なし（json_schemaのみ） |
+| **スキーマ保証** | `strict: true` で100%保証 | スキーマ強制で高信頼性 |
+| **Nullable** | `["string", "null"]` | `Optional[str]` (Pydantic) |
+
+---
+
+## 5. Tool Use / Function Callingの比較
+
+| 項目 | OpenAI | Anthropic |
+|---|---|---|
+| **呼称** | Function Calling / Tool Use | Tool Use |
+| **ツール定義** | `tools[].function.parameters` (JSON Schema) | `tools[].input_schema` (JSON Schema) |
+| **Strict mode** | `function.strict: true` | `strict: true`（ツール定義内） |
+| **並列呼び出し** | `tool_calls`（リスト） | 複数の`tool_use` content block |
+| **結果返却** | `{"role": "tool", "tool_call_id": ..., "content": ...}` | `{"role": "user", "content": [{"type": "tool_result", ...}]}` |
+| **tool_choice** | `"auto"` / `"required"` / `"none"` / 特定指定 | `{type: "auto"}` / `{type: "any"}` / `{type: "none"}` / `{type: "tool", name: ...}` |
+
+---
+
+## 6. コスト・パフォーマンスの比較（2026年時点）
+
+### OpenAI 現行モデル一覧
+
+| モデル | 用途 | 特徴 |
+|---|---|---|
+| **gpt-5.4** | 汎用フラグシップ | Context 1M tokens、Computer-use内蔵 |
+| **gpt-5.4-pro** | 高難度タスク | より長く考えて高精度な回答 |
+| **gpt-5.4-mini** | コスト・速度重視 | 低レイテンシ |
+| **gpt-5.4-nano** | 大量処理・単純タスク | 最小・最速 |
+| gpt-4o / gpt-4o mini | 音声入出力が必要な場合 | マルチモーダル（音声）対応 |
+| gpt-4.1 | Fine-tuning用途 | SFT対応 |
+
+### Claudeとの比較
+
+| 比較軸 | OpenAI | Anthropic |
+|---|---|---|
+| フラグシップ | gpt-5.4 | claude-opus-4-6 |
+| バランス型 | gpt-5.4-mini | claude-sonnet-4-6 |
+| 軽量 | gpt-5.4-nano | claude-haiku-4-5 |
+| Context | **1M tokens**（gpt-5.4） | 200K tokens |
+| Computer-use | gpt-5.4に内蔵 | 別途 tool として提供 |
+
+**実務選択の指針**:
+- **どちらもほぼ同等の能力**。タスクによる向き不向きを実測で判断するのが現実的
+- 長文コンテキスト: GPT-5.4（1M）が優位
+- コスト重視: gpt-5.4-nano / claude-haiku-4-5
+
+---
+
+## 7. SDKの書き方比較
+
+### チャット送信（基本）
+
+**OpenAI Python SDK**:
+```python
+from openai import OpenAI
+client = OpenAI()
+
+response = client.chat.completions.create(
+    model="gpt-5.4",
+    messages=[
+        {"role": "system", "content": "あなたはアシスタントです"},
+        {"role": "user", "content": "こんにちは"},
+    ],
+)
+print(response.choices[0].message.content)
+```
+
+**Anthropic Python SDK**:
+```python
+import anthropic
+client = anthropic.Anthropic()
+
+response = client.messages.create(
+    model="claude-sonnet-4-6",
+    max_tokens=1024,
+    system="あなたはアシスタントです",
+    messages=[
+        {"role": "user", "content": "こんにちは"},
+    ],
+)
+print(response.content[0].text)
+```
+
+**主な違い**:
+- OpenAI: `system` もmessagesリストに入れる / レスポンスは `response.choices[0].message.content`
+- Anthropic: `system` はトップレベルパラメータ / レスポンスは `response.content[0].text` / `max_tokens` が必須
+
+---
+
+## 8. 移行・共存パターン
+
+既存のOpenAIコードをAnthropicに移行、またはマルチプロバイダー対応する場合。
+
+### LiteLLMを使う（推奨）
+```python
+import litellm
+
+# OpenAI
+response = litellm.completion(
+    model="gpt-5.4",
+    messages=[{"role": "user", "content": "hello"}]
+)
+
+# Anthropicに切り替え（コード変更なし）
+response = litellm.completion(
+    model="claude-sonnet-4-6",
+    messages=[{"role": "user", "content": "hello"}]
+)
+```
+
+### OpenAI互換エンドポイントを使う
+AnthropicはOpenAI互換APIを提供していない（2025年時点）。  
+LangChain / LiteLLMなどの抽象レイヤーを使うのが現実的。
+
+---
+
+## 参考リンク
+
+- [OpenAI API Reference](https://platform.openai.com/docs/api-reference)
+- [Anthropic API Reference](https://docs.anthropic.com/en/api/getting-started)
+- [LiteLLM（マルチプロバイダー対応ライブラリ）](https://docs.litellm.ai)
+- [OpenAI Cookbook](https://cookbook.openai.com)
+- [Anthropic Cookbook](https://github.com/anthropics/anthropic-cookbook)

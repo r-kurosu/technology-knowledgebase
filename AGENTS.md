@@ -8,4 +8,4 @@ ITの基礎知識をMarkdownで体系化した学習ノート群。
 
 ## 構成
 - `it-fundamentals/` — IT基礎（ネットワーク・セキュリティ・コンピュート等）
-- `ai-engineering/` — AIエンジニアリング（未着手）
+- `ai-engineering/` — AIプロバイダー別ノート（anthropic / openai / google）
