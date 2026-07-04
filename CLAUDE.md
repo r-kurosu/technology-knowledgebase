@@ -15,6 +15,13 @@ ai-engineering/         # 未着手
 ノートのテンプレートは `it-fundamentals/00_learning_system/output_template.md`。
 AI利用の詳細ルールは `it-fundamentals/00_learning_system/ai_usage_rules.md`。
 
+## コンピュートに関する前提
+
+昔はEC2が主流だったが、今は簡易的な用途ならECS(+Fargate)やLambdaなどの
+マネージドサービスが好まれる。ユーザー自身もECSを使うことが多い。
+コンピュート関連の説明・比較では、この前提（EC2はもはやデフォルトの選択肢ではない）を
+踏まえること。
+
 ## Claudeへの指示
 
 ### チャット内容をノートに残す（最重要）
