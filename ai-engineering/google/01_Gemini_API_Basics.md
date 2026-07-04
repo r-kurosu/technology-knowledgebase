@@ -21,25 +21,30 @@ Google AIには2つの入口がある。
 
 ---
 
-## 2. モデル一覧（2026年4月時点）
+## 2. モデル一覧（2026年7月時点）
 
-### Gemini 3 系（最新世代）
+### Gemini 3.5 系（最新世代）
 
-| モデルID | 特徴 | Context |
+| モデル | 特徴 | Context |
 |---|---|---|
-| `gemini-3.1-pro-preview` | 最上位フラグシップ、高度な推論・エージェント | 1M tokens |
-| `gemini-3-flash` | Pro並みの推論力 + Flash の低レイテンシ | 1M tokens |
-| `gemini-3.1-flash-lite` | コスト重視・大量処理向け | 1M tokens |
+| Gemini 3.5 Pro | プレミアム推論フラグシップ（順次展開中） | 1M tokens |
+| Gemini 3.5 Flash | Flash級の速度・コストでPro級に迫る知能（GA） | 1M tokens |
 
-### Gemini 2.5 系（安定版 ← 本番推奨）
+### Gemini 3.1 系
 
-| モデルID | 特徴 | Context |
+| モデル | 特徴 | Context |
 |---|---|---|
-| `gemini-2.5-pro` | 複雑な推論・コード・数学・長文処理 | 1M tokens |
-| `gemini-2.5-flash` | 価格対性能バランス最良 | 1M tokens |
-| `gemini-2.5-flash-lite` | 最安・最高スループット | 128K tokens |
+| Gemini 3.1 Pro | 推論重視。Adaptive Thinking・グラウンディング | 1M tokens |
+| Gemini 3.1 Flash-Lite | コスト効率重視の大量処理向け | 1M tokens |
 
-> Gemini 3 は `preview` 扱いが多い。本番は 2.5 系が安定。  
+### 画像生成
+
+| モデル | 特徴 |
+|---|---|
+| Nano Banana Pro（Gemini 3 Pro Image） | 最高品質の画像生成 |
+| Nano Banana 2（Gemini 3.1 Flash Image） | 高スループット・低価格 |
+
+> 正確なモデルID・スペックは流動的なため、利用前に公式ドキュメントで確認すること。  
 > Preview モデルは最低2週間の廃止予告で変更される場合あり。
 
 ---

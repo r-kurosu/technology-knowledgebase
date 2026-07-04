@@ -1,20 +1,18 @@
-# Domain 1: Agentic Architecture & Orchestration (27%)
+# Agentic Architecture & Orchestration
 
-**試験全体の27%を占める最重要ドメイン**
+Claudeを使ったエージェント / マルチエージェントシステムの設計・オーケストレーションに関するノート。
 
----
+## 1. このノートで扱うトピック
 
-## 1. タスクステートメント一覧（公式試験ガイド）
-
-| タスク | 内容 |
+| トピック | 内容 |
 |--------|------|
-| **1.1** | エージェンティックループの設計と実装（自律的タスク実行） |
-| **1.2** | コーディネーター・サブエージェントパターンによるマルチエージェントシステムのオーケストレーション |
-| **1.3** | サブエージェントの呼び出し、コンテキスト受け渡し、スポーンの設定 |
-| **1.4** | エンフォースメントとハンドオフパターンによるマルチステップワークフローの実装 |
-| **1.5** | Agent SDKフックによるツールコールのインターセプトとデータ正規化 |
-| **1.6** | 複雑なワークフローのためのタスク分解戦略の設計 |
-| **1.7** | セッション状態と再開の管理（コンテキストウィンドウ管理、段階的要約、重要データ用イミュータブルファクトブロック） |
+| エージェンティックループ | 自律的タスク実行の基本ループ設計 |
+| マルチエージェント | コーディネーター・サブエージェントパターンによるオーケストレーション |
+| サブエージェント | 呼び出し・コンテキスト受け渡し・スポーンの設定 |
+| ワークフロー | エンフォースメントとハンドオフパターンによるマルチステップ実装 |
+| フック | Agent SDKフックによるツールコールのインターセプトとデータ正規化 |
+| タスク分解 | 複雑なワークフローのための分解戦略 |
+| セッション管理 | 状態と再開（コンテキストウィンドウ管理、段階的要約、イミュータブルファクトブロック） |
 
 ---
 
@@ -34,7 +32,7 @@
 - **`end_turn`**: Claudeが作業を完了 → **ループ終了**
 - 正しいパターン: `stop_reason === "end_turn"` を唯一のループ終了シグナルとして使用
 
-### 試験で問われるアンチパターン
+### 避けるべきアンチパターン
 - **イテレーションキャップ**: 最大ループ回数を設定する（脆弱 — 実タスクは必要ステップ数が変動する）
 - **自然言語パース**: Claudeの応答に「DONE」「COMPLETE」が含まれるかチェック（非信頼性）
 - **固定ステップ数での終了**: タスクの性質を無視した硬直的な終了条件
@@ -63,7 +61,7 @@
 
 ---
 
-## 4. 5つのワークフローパターン（必須暗記）
+## 4. 5つのワークフローパターン
 
 ### 4.1 プロンプトチェーニング（Prompt Chaining）
 - タスクを一連のステップに分解し、各LLMコールが前の出力を処理
@@ -127,7 +125,7 @@
 - サブエージェントは独自のコンテキストウィンドウで並列動作し、最も重要なトークンだけをリードエージェントに圧縮して返す
 
 ### モデル構成の例
-- リード: Claude Opus 4.7（高い推論能力）
+- リード: Claude Opus 4.8（高い推論能力）
 - サブエージェント: Claude Sonnet 4.6（コスト効率）
 - 結果: 単一エージェントよりも高い性能
 
@@ -273,13 +271,5 @@ Anthropicが提供するフルマネージドエージェントハーネス。�
 - [Scaling Managed Agents: Decoupling the brain from the harness](https://www.anthropic.com/engineering/managed-agents)
 - [New capabilities for building agents on the Anthropic API](https://www.anthropic.com/news/agent-capabilities-api)
 
-### 学習サイト
-- [Tutorials Dojo CCA-F Study Guide](https://tutorialsdojo.com/cca-f-claude-certified-architect-foundations-study-guide/)
-- [Claude Certifications - Domain 1](https://claudecertifications.com/claude-certified-architect/domains/agentic-architecture)
-- [Claude Certification Guide - Agentic Architecture](https://claudecertificationguide.com/learn/1-agentic-architecture)
-- [FlashGenius - Mastering Agentic Architecture](https://flashgenius.net/blog-article/mastering-agentic-architecture-the-core-pillar-of-the-claude-certified-architect-exam)
-
 ### GitHub
-- [timothywarner-org/claude-architect](https://github.com/timothywarner-org/claude-architect)
-- [carolinacherry/claude-certified-architect](https://github.com/carolinacherry/claude-certified-architect)
-- [ThibautMelen/agentic-workflow-patterns](https://github.com/ThibautMelen/agentic-workflow-patterns)
+- [ThibautMelen/agentic-workflow-patterns](https://github.com/ThibautMelen/agentic-workflow-patterns) — ワークフローパターン実装例

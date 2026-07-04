@@ -1,4 +1,6 @@
-# CCA-F 公式ドキュメント & リンク集
+# Anthropic / Claude 参考リンク集
+
+Anthropic API・Claude Code・MCP に関する公式ドキュメントと学習リソースのリンク集。
 
 ---
 
@@ -123,33 +125,4 @@
   - [Tool Choice](https://github.com/anthropics/anthropic-cookbook/blob/main/tool_use/tool_choice.ipynb)
 
 ### コミュニティ
-- [timothywarner-org/claude-architect](https://github.com/timothywarner-org/claude-architect) — 全5ドメインのスタディ資料
-- [carolinacherry/claude-certified-architect](https://github.com/carolinacherry/claude-certified-architect) — 30タスクステートメント
-- [OlivierAlter/CCA-F](https://github.com/OlivierAlter/Claude-Certified-Architect-Foundations-Certification-Exam) — 77問シナリオベース
-- [paullarionov/claude-certified-architect](https://github.com/paullarionov/claude-certified-architect) — 多言語ガイド
-- [daronyondem/claude-architect-exam-guide](https://github.com/daronyondem/claude-architect-exam-guide)
-- [SGridworks/claude-certified-architect-training](https://github.com/SGridworks/claude-certified-architect-training) — 12週間トレーニング
 - [ThibautMelen/agentic-workflow-patterns](https://github.com/ThibautMelen/agentic-workflow-patterns) — ワークフローパターン実装例
-
----
-
-## 試験準備サイト
-
-| サイト | URL |
-|--------|-----|
-| Claude Certifications | [claudecertifications.com](https://claudecertifications.com/) |
-| Claude Certification Guide | [claudecertificationguide.com](https://claudecertificationguide.com) |
-| Tutorials Dojo | [tutorialsdojo.com](https://tutorialsdojo.com/cca-f-claude-certified-architect-foundations-study-guide/) |
-| CCA-F Study Guide | [ccaf-study-guide.pages.dev](https://ccaf-study-guide.pages.dev/) |
-| CertStud | [certstud.com](https://certstud.com/certifications/anthropic/claude-architect) |
-| CertLand | [certland.net](https://certland.net/blog/cca-f-exam-day-experience-what-to-expect/) |
-| CertSafari | [certsafari.com](https://www.certsafari.com/anthropic/claude-certified-architect) |
-| FlashGenius | [flashgenius.net](https://flashgenius.net/blog-article/a-guide-to-the-claude-certified-architect-foundations-certification) |
-| AI.cc | [ai.cc](https://www.ai.cc/blogs/claude-certified-architect-foundations-cca-f-exam-guide-2026/) |
-
----
-
-## 公式試験ガイド
-
-- [Exam Guide PDF](https://everpath-course-content.s3-accelerate.amazonaws.com/instructor/8lsy243ftffjjy1cx9lm3o2bw/public/1773274827/Claude+Certified+Architect+%E2%80%93+Foundations+Certification+Exam+Guide.pdf)
-- [Anthropic Claude Partner Network](https://www.anthropic.com/news/claude-partner-network)

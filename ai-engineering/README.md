@@ -1,15 +1,14 @@
 # ai-engineering
 
-各AIプロバイダー（Anthropic・OpenAI・Google）のAPI・ベストプラクティス・試験対策の学習ノート。
-
-`ai-bestpractices-playbook` リポジトリのノートを統合したもの。
+各AIプロバイダー（Anthropic・OpenAI・Google）の API・ベストプラクティスの学習ノート。
+Claude / GPT / Gemini を実務で使う際の設計・実装パターンを、プロバイダー間の共通点・相違点を意識してまとめる。
 
 ## 構成
 
 | ディレクトリ | 内容 |
 |---|---|
-| [anthropic/](anthropic/) | Claude・CCA-F試験対策・Anthropicベストプラクティス（Domain1〜5・API実装例・模擬問題集） |
-| [openai/](openai/) | OpenAI APIベストプラクティス・Azure OpenAI・比較ノート |
+| [anthropic/](anthropic/) | Claude API・Agent SDK・Claude Code（エージェント設計・プロンプト・ツール/MCP・コンテキスト管理・実装例） |
+| [openai/](openai/) | OpenAI / GPT API ベストプラクティス・Azure OpenAI・比較ノート |
 | [google/](google/) | Gemini API・Vertex AI・マルチモーダル・ロングコンテキスト |
 
 ## 関連ノート

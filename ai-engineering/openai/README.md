@@ -18,12 +18,16 @@ Anthropic/Claudeとの共通点・相違点を意識した構成。
 | [09_Fine_tuning.md](09_Fine_tuning.md) | Fine-tuning の判断基準・データセット準備・実行手順 |
 | [10_Vision_Multimodal.md](10_Vision_Multimodal.md) | 画像入力・Vision API・ドキュメント理解 |
 
-## 対象モデル（2026年時点）
+## 対象モデル（2026年7月時点）
 
-- **gpt-5.4**（主力フラグシップ、Context 1M tokens）
-- **gpt-5.4-mini / nano**（コスト・速度重視）
-- **gpt-5.4-pro**（高難度タスク向け）
+- **GPT-5.5 / GPT-5.5 Pro** — 最新フラグシップ（GPT-5.4 より高性能かつトークン効率が良い）
+- **GPT-5.4 Thinking / Pro** — 推論・高難度タスク向け
+- **GPT-5.4 mini / nano** — コスト・速度重視（nano は API 限定）
+- **GPT-5.3 Instant** — 各ティアの既定モデル
+- GPT-5.6 系（Sol / Terra / Luna）は限定プレビュー
 - gpt-4o / gpt-4o mini（音声入出力が必要な場合のみ）
+
+> モデルの詳細スペック（コンテキスト長・価格）は流動的なため、利用前に公式ドキュメントで確認すること。
 
 ## 参考リンク
 

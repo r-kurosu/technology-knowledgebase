@@ -1,4 +1,6 @@
-# Domain 2: Claude Code Configuration & Workflows (20%)
+# Claude Code Configuration & Workflows
+
+Claude Code の設定（CLAUDE.md・スキル・権限・フック）と CI/CD 連携に関するノート。
 
 ---
 
@@ -14,8 +16,7 @@
 | 作業ディレクトリ上位の `CLAUDE.md` | 上位ディレクトリのコンテキスト | 起動時にフルロード |
 | サブディレクトリの `CLAUDE.md` | サブディレクトリ固有 | **オンデマンド**（Claudeがそのディレクトリのファイルを読む際に遅延読み込み） |
 
-### Compaction（圧縮）時の動作（試験頻出）
-- **プロジェクトルートの CLAUDE.md**: `/compact` 後にディスクから再読み込みされ、セッションに再注入される
+### Compaction（圧縮）時の動作- **プロジェクトルートの CLAUDE.md**: `/compact` 後にディスクから再読み込みされ、セッションに再注入される
 - **サブディレクトリの CLAUDE.md**: 自動的には再注入されない。次にそのディレクトリのファイルをClaudeが読む際に再読み込み
 - `/compact` にフォーカスを指定可能（例: `/compact focus on the API changes`）
 
@@ -35,8 +36,7 @@
 - サブディレクトリでの再帰的発見をサポート
 - シンボリックリンクをサポート（複数プロジェクトでルール共有可能）
 
-### Glob パターンによるパス固有ルール（試験重要）
-
+### Glob パターンによるパス固有ルール
 ```yaml
 ---
 paths:
@@ -62,8 +62,7 @@ TypeScript のコーディング規約をここに記述...
 | 自律起動 | 不可 | 可能（frontmatterで設定） |
 | サポートファイル | なし | ディレクトリ内に配置可能 |
 
-### SKILL.md のフロントマター構成（試験頻出）
-
+### SKILL.md のフロントマター構成
 ```yaml
 ---
 name: review
@@ -98,8 +97,7 @@ user-invocable: true
 | 4 | Project | `.claude/settings.json` | チーム共有設定（ソース管理対象） |
 | 5（最低） | User | `~/.claude/settings.json` | 個人のグローバル設定 |
 
-### マージ動作（試験重要）
-- **配列設定は結合（マージ）される**: `permissions.allow` や `sandbox.filesystem.allowWrite` など配列値の設定は、全スコープの値が**連結・重複排除**される（置換ではない）
+### マージ動作- **配列設定は結合（マージ）される**: `permissions.allow` や `sandbox.filesystem.allowWrite` など配列値の設定は、全スコープの値が**連結・重複排除**される（置換ではない）
 - **deny ルールは常に優先**: いずれかのレベルで deny されたツールは、他のレベルで allow できない
 - **Managed設定は上書き不可**（`--allowedTools` でも覆せない）
 
@@ -112,8 +110,7 @@ user-invocable: true
 
 ルール構文: `Tool` または `Tool(specifier)` （例: `Bash(npm run *)`, `Edit(src/**/*.ts)`）
 
-### パーミッションモード（試験頻出）
-
+### パーミッションモード
 | モード | 説明 |
 |---|---|
 | `default` | 標準のパーミッション動作 |
@@ -149,14 +146,13 @@ user-invocable: true
 | `Notification` | 通知送信時 | - |
 | `PreCompact` | 圧縮前 | - |
 
-### フックの終了コード（試験重要）
-- `exit 0` → アクション続行
+### フックの終了コード- `exit 0` → アクション続行
 - `exit 2` → アクションブロック（stderrに理由を出力）
 - その他の終了コード → アクション続行
 
 ---
 
-## 7. CI/CD パイプライン統合（試験直接出題）
+## 7. CI/CD パイプライン統合
 
 ### ヘッドレスモード（-p フラグ）
 `-p` (または `--print`) フラグはClaude Codeを**非対話モード**で実行する。これがないとCIジョブは入力待ちでハングする。
@@ -168,7 +164,7 @@ claude -p "コードをレビューして問題を報告してください"
 ### ベアモード（Bare Mode）
 CI やスクリプトで**全マシンで同じ結果を得る**ために使用。`~/.claude` のフックやプロジェクトの `.mcp.json` の MCP サーバーは実行されない。
 
-### 同期 API vs Batch API（試験重要な使い分け）
+### 同期 API vs Batch API（使い分け）
 
 | 方式 | 用途 |
 |---|---|
@@ -195,7 +191,7 @@ CI やスクリプトで**全マシンで同じ結果を得る**ために使用�
 
 ---
 
-## 9. チェックポイント & /rewind（試験新出）
+## 9. チェックポイント & /rewind
 
 各コード変更の前に自動でコードステートを保存するチェックポイントシステム。
 
@@ -203,23 +199,25 @@ CI やスクリプトで**全マシンで同じ結果を得る**ために使用�
 - **Esc × 2** または `/rewind` コマンドで直前のチェックポイントに即座に巻き戻し
 - 大規模なワイドスケールタスクを安心して実行可能にする安全網
 
-### 重要な試験ポイント
+### 重要ポイント
 - チェックポイントは**ツール実行前**に自動作成（ユーザー操作不要）
 - チェックポイントとパーミッション機能は独立して機能する
 
 ---
 
-## 10. /ultrareview
+## 10. /code-review ultra
 
-専用レビューセッションを起動するスラッシュコマンド。変更箇所を読み込み、バグと設計上の問題をフラグする。
+専用レビューセッションをクラウドで起動するスラッシュコマンド。現在のブランチ（またはPR）を読み込み、
+バグと設計上の問題をフラグする。
 
 ```
-/ultrareview
-/ultrareview <PR番号>    # GitHubのPRを直接レビュー
+/code-review ultra          # ローカルの現在ブランチをレビュー
+/code-review ultra <PR番号>  # GitHubのPRを直接レビュー
 ```
 
-- Proプランおよびそれ以上のユーザーが利用可能
-- 内部的に複数の専門エージェントを並列で動かし、包括的なレビューを生成
+- 内部的に複数の専門エージェントを並列で動かし、包括的なレビューを生成（マルチエージェントのクラウドレビュー）
+- `/ultrareview` は同コマンドの非推奨エイリアス
+- git リポジトリが必要（no-arg 形式はローカルブランチをまとめるため GitHub リモート不要）
 
 ---
 
@@ -237,7 +235,7 @@ Claude Codeがより少ない中断でより長いタスクを自律的に実行
 | 機能 | 説明 |
 |---|---|
 | `Ctrl+r` | **プロンプト履歴の検索**。過去のプロンプトを再利用・編集可能 |
-| `xhigh` effort | Claude Codeのデフォルト effortレベルを `xhigh` に引き上げ（Opus 4.7対応） |
+| `xhigh` effort | Claude Codeのデフォルト effortレベルを `xhigh` に引き上げ（Opus 4.7で追加、4.8でも利用可） |
 | ターミナルUI刷新 | ステータス視認性の向上 |
 
 ---
@@ -261,6 +259,3 @@ Claude Codeがより少ない中断でより長いタスクを自律的に実行
 - [Code Review](https://code.claude.com/docs/en/code-review)
 - [Create custom subagents](https://code.claude.com/docs/en/sub-agents)
 - [Best Practices for Claude Code](https://code.claude.com/docs/en/best-practices)
-
-### 公式試験ガイドPDF
-- [Exam Guide PDF](https://everpath-course-content.s3-accelerate.amazonaws.com/instructor/8lsy243ftffjjy1cx9lm3o2bw/public/1773274827/Claude+Certified+Architect+%E2%80%93+Foundations+Certification+Exam+Guide.pdf)

@@ -4,14 +4,17 @@
 
 ---
 
-## 1. モデルラインナップ（2026年4月時点）
+## 1. モデルラインナップ（2026年7月時点）
 
 | ティア | Google | OpenAI | Anthropic |
 |---|---|---|---|
-| 最上位フラグシップ | `gemini-3.1-pro-preview` | `gpt-5.4` | `claude-opus-4-6` |
-| バランス型 | `gemini-2.5-flash` | `gpt-5.4-mini` | `claude-sonnet-4-6` |
-| 軽量・高速 | `gemini-2.5-flash-lite` | `gpt-5.4-nano` | `claude-haiku-4-5` |
-| 推論特化 | `gemini-3-flash`（Dynamic Thinking） | `gpt-5.4-pro` | Claude（Extended Thinking） |
+| 最上位フラグシップ | Gemini 3.5 Pro | GPT-5.5 | `claude-fable-5` |
+| 主力（既定） | Gemini 3.5 Flash | `gpt-5.4` 系 | `claude-opus-4-8` |
+| バランス型 | Gemini 3.1 Flash-Lite | `gpt-5.4-mini` | `claude-sonnet-4-6` |
+| 軽量・高速 | Gemini 3.1 Flash-Lite | `gpt-5.4-nano` | `claude-haiku-4-5` |
+| 推論特化 | Gemini（Dynamic Thinking） | `gpt-5.4` Thinking/Pro | Claude（Adaptive Thinking） |
+
+> モデルの最新情報は流動的なため、選定時に各社の公式ドキュメントを確認すること。
 
 ---
 
@@ -31,13 +34,13 @@
 
 | モデル | Context | 出力上限 |
 |---|---|---|
-| `gemini-2.5-pro` | **1M tokens** | 65,536 tokens |
-| `gemini-2.5-flash` | **1M tokens** | 65,536 tokens |
-| `gpt-5.4` | **1M tokens** | 未公表 |
-| `claude-opus-4-6` | 200K tokens | 32K tokens |
-| `claude-sonnet-4-6` | 200K tokens | 32K tokens |
+| Gemini 3.5 Flash | **1M tokens** | 65,536 tokens |
+| `gpt-5.4` 系 | **1M tokens** | 未公表 |
+| `claude-fable-5` / `claude-opus-4-8` | **1M tokens** | 128K tokens |
+| `claude-sonnet-4-6` | **1M tokens** | 64K tokens |
+| `claude-haiku-4-5` | 200K tokens | 64K tokens |
 
-> 長文処理が必要なら Gemini か GPT-5.4 が有利。Claudeは200K止まり。
+> 主要3社ともフラグシップは 1M コンテキストに対応。長文処理でのコンテキスト長差は縮小している。
 
 ---
 

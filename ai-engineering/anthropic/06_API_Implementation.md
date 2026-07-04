@@ -14,7 +14,7 @@ import anthropic
 client = anthropic.Anthropic(api_key="sk-ant-...")  # 省略時は環境変数 ANTHROPIC_API_KEY を使用
 
 response = client.messages.create(
-    model="claude-sonnet-4-6",          # 最新: claude-opus-4-7 / claude-opus-4-6 / claude-sonnet-4-6 / claude-haiku-4-5-20251001
+    model="claude-sonnet-4-6",          # 現行: claude-fable-5(最上位) / claude-opus-4-8(推奨既定) / claude-opus-4-7 / claude-sonnet-4-6 / claude-haiku-4-5
     max_tokens=1024,                     # 必須。出力の最大トークン数
     system="あなたは親切なアシスタントです。",  # オプション。システムプロンプト
     messages=[
@@ -169,7 +169,7 @@ print(result)
 
 **重要な落とし穴**:
 - `content[0].type == "text"` でループ終了を判定してはいけない。Claudeはテキストと tool_use を同時に返すことがある
-- `stop_reason == "tool_use"` でループ継続、`"end_turn"` で終了が正しいパターン（CCA-F 問題1の核心）
+- `stop_reason == "tool_use"` でループ継続、`"end_turn"` で終了が正しいパターン（エージェントループの核心）
 
 ---
 
@@ -284,7 +284,7 @@ response = client.messages.create(
 | 初回リクエスト | キャッシュ書き込み（`cache_creation_input_tokens` に計上） |
 | 2回目以降（TTL内） | キャッシュヒット（`cache_read_input_tokens` に計上、コスト約90%削減） |
 | TTL経過後 | 再度書き込み |
-| キャッシュ可能な最小トークン数 | claude-sonnet-4-6: 約1024〜2048トークン |
+| キャッシュ可能な最小トークン数 | claude-sonnet-4-6 / claude-fable-5: 2,048トークン、claude-opus-4-8/4.7/4.6・Haiku 4.5: 4,096トークン |
 
 **配置のルール**: `cache_control` はプロンプトの**先頭側**（変化しない部分）に置く。末尾の変動する部分にキャッシュを指定しても効果が低い。
 

@@ -6,11 +6,10 @@
 
 | モデル | Context Window | 備考 |
 |---|---|---|
-| `gemini-2.5-pro` | **1,048,576 tokens（1M）** | 長文処理の主力 |
-| `gemini-2.5-flash` | **1,048,576 tokens（1M）** | コスパ型で同じ1M |
-| `gemini-2.5-flash-lite` | 128K tokens | 大量スループット向け |
-| `claude-sonnet-4-6` | 200K tokens | 比較参考 |
-| `gpt-5.4` | 1M tokens | 比較参考 |
+| Gemini 3.5 Flash / 3.1 Pro | **1,048,576 tokens（1M）** | 長文処理の主力 |
+| `gemini-2.5-pro` / `gemini-2.5-flash` | **1,048,576 tokens（1M）** | 安定版 |
+| `claude-opus-4-8` / `claude-sonnet-4-6` / `claude-fable-5` | **1M tokens** | 比較参考 |
+| `gpt-5.4` 系 | 1M tokens | 比較参考 |
 
 1Mトークンのスケール感:
 - 約750万文字（日本語）

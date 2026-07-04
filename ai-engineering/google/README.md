@@ -17,21 +17,27 @@ Anthropic / OpenAI との共通点・相違点を意識した構成。
 | [08_Vertex_AI.md](08_Vertex_AI.md) | エンタープライズ利用（Google Cloud / Vertex AI） |
 | [09_vs_OpenAI_Anthropic.md](09_vs_OpenAI_Anthropic.md) | 3プロバイダー比較まとめ |
 
-## 対象モデル（2026年4月時点）
+## 対象モデル（2026年7月時点）
 
-### Gemini 3 系（最新世代）
-| モデルID | 特徴 |
+### Gemini 3.5 系（最新世代）
+| モデル | 特徴 |
 |---|---|
-| `gemini-3.1-pro-preview` | 最上位フラグシップ（Preview） |
-| `gemini-3-flash` | 複雑なタスクに対応するFlash（低レイテンシ） |
-| `gemini-3.1-flash-lite` | コスト重視・大量処理向け |
+| Gemini 3.5 Pro | プレミアム推論フラグシップ（順次展開中） |
+| Gemini 3.5 Flash | Flash級の速度・コストでPro級に迫る知能、1M コンテキスト（GA） |
 
-### Gemini 2.5 系（安定版）
-| モデルID | Context | 特徴 |
-|---|---|---|
-| `gemini-2.5-pro` | **1M tokens** | 複雑な推論・コーディング・長文処理 |
-| `gemini-2.5-flash` | **1M tokens** | 価格対性能バランス最良 |
-| `gemini-2.5-flash-lite` | 128K tokens | 最安・最高スループット |
+### Gemini 3.1 系
+| モデル | 特徴 |
+|---|---|
+| Gemini 3.1 Pro | 推論重視。Adaptive Thinking・1M コンテキスト・グラウンディング |
+| Gemini 3.1 Flash-Lite | コスト効率重視の大量処理向けワークホース |
+
+### 画像生成
+| モデル | 特徴 |
+|---|---|
+| Nano Banana Pro（Gemini 3 Pro Image） | 最高品質の画像生成 |
+| Nano Banana 2（Gemini 3.1 Flash Image） | 高スループット・低価格 |
+
+> 正確なモデルID・コンテキスト長・価格は流動的なため、利用前に公式ドキュメントで確認すること。
 
 ## 参考リンク
 

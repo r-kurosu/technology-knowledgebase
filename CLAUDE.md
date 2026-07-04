@@ -9,7 +9,7 @@ it-fundamentals/
   00_learning_system/   # 学習ルール・テンプレート
   01_core_topics/       # ネットワーク・セキュリティ・コンピュート等（10分野）
   02_applied_topics/    # データプラットフォーム・RAG/Agent等
-ai-engineering/         # AIプロバイダー別ノート（anthropic/openai/google）
+ai-engineering/         # AIプロバイダー別のAPI・ベストプラクティスノート（anthropic/openai/google）
 ```
 
 ノートのテンプレートは `it-fundamentals/00_learning_system/output_template.md`。

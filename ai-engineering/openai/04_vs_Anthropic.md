@@ -69,33 +69,33 @@
 
 ---
 
-## 6. コスト・パフォーマンスの比較（2026年時点）
+## 6. コスト・パフォーマンスの比較（2026年7月時点）
 
 ### OpenAI 現行モデル一覧
 
 | モデル | 用途 | 特徴 |
 |---|---|---|
-| **gpt-5.4** | 汎用フラグシップ | Context 1M tokens、Computer-use内蔵 |
-| **gpt-5.4-pro** | 高難度タスク | より長く考えて高精度な回答 |
-| **gpt-5.4-mini** | コスト・速度重視 | 低レイテンシ |
-| **gpt-5.4-nano** | 大量処理・単純タスク | 最小・最速 |
+| **GPT-5.5 / 5.5 Pro** | 最新フラグシップ | GPT-5.4 より高性能・高トークン効率 |
+| **gpt-5.4 Thinking / Pro** | 高難度・推論タスク | より長く考えて高精度な回答 |
+| **gpt-5.4-mini / nano** | コスト・速度重視 | 低レイテンシ（nano は API 限定） |
+| GPT-5.3 Instant | 各ティアの既定 | 標準的な応答速度 |
 | gpt-4o / gpt-4o mini | 音声入出力が必要な場合 | マルチモーダル（音声）対応 |
-| gpt-4.1 | Fine-tuning用途 | SFT対応 |
 
 ### Claudeとの比較
 
 | 比較軸 | OpenAI | Anthropic |
 |---|---|---|
-| フラグシップ | gpt-5.4 | claude-opus-4-6 |
+| 最上位 | GPT-5.5 | claude-fable-5 |
+| フラグシップ（既定） | gpt-5.4 系 | claude-opus-4-8 |
 | バランス型 | gpt-5.4-mini | claude-sonnet-4-6 |
 | 軽量 | gpt-5.4-nano | claude-haiku-4-5 |
-| Context | **1M tokens**（gpt-5.4） | 200K tokens |
-| Computer-use | gpt-5.4に内蔵 | 別途 tool として提供 |
+| Context | 最大 1M tokens | 最大 1M tokens（Opus/Sonnet/Fable）、Haiku は 200K |
+| Computer-use | モデルに内蔵 | 別途 tool として提供 |
 
 **実務選択の指針**:
 - **どちらもほぼ同等の能力**。タスクによる向き不向きを実測で判断するのが現実的
-- 長文コンテキスト: GPT-5.4（1M）が優位
 - コスト重視: gpt-5.4-nano / claude-haiku-4-5
+- モデルの最新情報は流動的なため、選定時に各社の公式ドキュメントを確認する
 
 ---
 
