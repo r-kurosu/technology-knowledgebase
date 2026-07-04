@@ -19,7 +19,7 @@ AIは、概念説明のたたき台、AWSサービス対応表、Mermaid構成�
 ## ディレクトリ構成
 
 ```text
-it-fundamentals/
+01_it-fundamentals/
 ├── 00_learning_system/       # 学習原則・テンプレート
 ├── 01_core_topics/           # 基礎となる10テーマ
 └── 02_applied_topics/        # データ基盤・RAG/Agent

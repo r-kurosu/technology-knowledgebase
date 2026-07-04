@@ -13,4 +13,4 @@ Claude / GPT / Gemini を実務で使う際の設計・実装パターンを、�
 
 ## 関連ノート
 
-- [it-fundamentals/02_applied_topics/02_rag_agent_architecture/](../it-fundamentals/02_applied_topics/02_rag_agent_architecture/) — RAG / Agent アーキテクチャ（IT基礎側の応用トピック）
+- [01_it-fundamentals/02_applied_topics/02_rag_agent_architecture/](../01_it-fundamentals/02_applied_topics/02_rag_agent_architecture/) — RAG / Agent アーキテクチャ（IT基礎側の応用トピック）
