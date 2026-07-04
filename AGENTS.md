@@ -11,3 +11,4 @@ ITの基礎知識をMarkdownで体系化した学習ノート群。
 - `02_ai-engineering/` — AIプロバイダー別のAPI・ベストプラクティスノート（anthropic / openai / google）
 - `03_business-domains/` — 業務ドメインの概念（ERP / CRM / SCM / PLM）
 - `04_sap/` — SAP（業務ドメインを実装する具体システム）
+- `05_fde-roadmap/` — Forward Deployed Engineer ロールとして習得すべきスキル・学習ロードマップ
