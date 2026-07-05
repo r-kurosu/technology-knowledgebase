@@ -123,53 +123,8 @@ model = genai.GenerativeModel(
 
 ## 6. Safety Settings（安全フィルター）
 
-Geminiには組み込みの安全フィルターがあり、デフォルトで有効。
-
-```python
-from google.generativeai.types import HarmCategory, HarmBlockThreshold
-
-model = genai.GenerativeModel(
-    model_name="gemini-2.5-flash",
-    safety_settings={
-        HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-        HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-    },
-)
-```
-
-> OpenAI / Anthropicにはモデルレベルの安全設定パラメータがない（プロンプトで制御）。  
-> Geminiは明示的に閾値を設定できる。
-
----
+<!-- 一言説明、30秒説明、採用理由を自分で書く -->
 
 ## 7. OpenAI互換エンドポイント
 
-GeminiはOpenAI互換APIを提供しており、SDKの切り替えが容易。
-
-```python
-from openai import OpenAI
-
-client = OpenAI(
-    api_key="YOUR_GEMINI_API_KEY",
-    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-)
-
-response = client.chat.completions.create(
-    model="gemini-2.5-flash",
-    messages=[{"role": "user", "content": "こんにちは"}],
-)
-print(response.choices[0].message.content)
-```
-
-> AnthropicはOpenAI互換エンドポイントを提供していない（LiteLLMで対応）。  
-> Geminiはネイティブ互換を提供しているため移行コストが低い。
-
----
-
-## 参考リンク
-
-- [Gemini API Quickstart](https://ai.google.dev/gemini-api/docs/quickstart)
-- [Models](https://ai.google.dev/gemini-api/docs/models)
-- [Python SDK Reference](https://ai.google.dev/api/python/google/generativeai)
+<!-- 判断問題への回答、疑問、理解度（A/B/C）を残す -->

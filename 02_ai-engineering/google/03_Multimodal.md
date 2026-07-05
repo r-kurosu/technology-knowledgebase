@@ -150,62 +150,8 @@ response = model.generate_content([
 
 ## 6. 複合モダリティ（テキスト + 画像 + PDF 混合）
 
-```python
-response = model.generate_content([
-    pdf_file,           # 仕様書PDF
-    screenshot_image,   # UIスクリーンショット
-    "仕様書の要件に対してこのUIが準拠しているか確認して、不足点をリストアップして"
-])
-```
-
----
+<!-- 一言説明、30秒説明、採用理由を自分で書く -->
 
 ## 7. media_resolution パラメータ（Gemini 3）
 
-Gemini 3では画像解像度の制御が可能。
-
-```python
-from google.generativeai.types import GenerationConfig
-
-model = genai.GenerativeModel(
-    "gemini-3-flash",
-    generation_config=GenerationConfig(
-        media_resolution="high"  # "low" / "medium" / "high"
-    )
-)
-```
-
-| 設定 | 用途 | トークン消費 |
-|---|---|---|
-| `"low"` | 大まかな内容把握、コスト重視 | 少 |
-| `"medium"` | バランス型（デフォルト） | 中 |
-| `"high"` | 細かいテキスト・図表の読み取り | 多 |
-
----
-
-## 8. マルチモーダル埋め込み
-
-Gemini Embedding 2はテキスト・画像・動画・音声を**統一ベクトル空間**に変換。
-
-```python
-result = genai.embed_content(
-    model="gemini-embedding-2",
-    content={"mime_type": "image/png", "data": image_data},
-)
-# テキストと画像の類似度をコサイン類似度で比較できる
-```
-
-ユースケース:
-- 画像+テキストの横断検索
-- マルチモーダルRAG
-- 視覚的な類似アイテム検索
-
----
-
-## 参考リンク
-
-- [Vision Understanding](https://ai.google.dev/gemini-api/docs/vision)
-- [Video Understanding](https://ai.google.dev/gemini-api/docs/video-understanding)
-- [Audio Understanding](https://ai.google.dev/gemini-api/docs/audio)
-- [Document Understanding](https://ai.google.dev/gemini-api/docs/document-processing)
-- [Files API](https://ai.google.dev/gemini-api/docs/files)
+<!-- 判断問題への回答、疑問、理解度（A/B/C）を残す -->

@@ -127,44 +127,8 @@ for chunk in response.candidates[0].grounding_metadata.grounding_chunks:
 
 ## 6. プロンプト設計の原則（Gemini公式）
 
-基本的にOpenAI・Anthropicと同じ。
-
-1. **明確で具体的な指示** — 曖昧さを排除
-2. **タスクの分割** — 複雑なタスクはステップに分ける
-3. **例示（Few-shot）** — 期待するフォーマットを見せる
-4. **制約の明示** — 文字数・形式・出力言語を指定
-5. **役割の明示** — system_instructionで専門家の役割を与える
-
-### NG → OK の変換
-
-| NG | OK |
-|---|---|
-| "短く答えて" | "3文以内で答えて" |
-| "詳しく説明して" | "技術者向けに箇条書き5点で説明して" |
-| "良い例を挙げて" | "実際のコード例を1つ、日本語コメント付きで示して" |
-
----
+<!-- 一言説明、30秒説明、採用理由を自分で書く -->
 
 ## 7. System Instruction vs プロンプト内指示
 
-```python
-# 推奨: system_instruction に永続的なルールを書く
-model = genai.GenerativeModel(
-    system_instruction="日本語で回答する。専門用語は英語のまま。"
-)
-
-# 各リクエストで変わる指示はプロンプトに書く
-response = model.generate_content("Transformerアーキテクチャを説明して")
-```
-
-**使い分け**:
-- `system_instruction`: 全会話を通じて変わらないルール・役割・制約
-- プロンプト: タスク固有の指示・入力データ・フォーマット指示
-
----
-
-## 参考リンク
-
-- [Prompt Design Strategies](https://ai.google.dev/gemini-api/docs/prompting-strategies)
-- [System Instructions](https://ai.google.dev/gemini-api/docs/system-instructions)
-- [Google Search Grounding](https://ai.google.dev/gemini-api/docs/grounding)
+<!-- 判断問題への回答、疑問、理解度（A/B/C）を残す -->

@@ -24,14 +24,8 @@ EventBridge、SNS、Step Functions、Lambda、ECS Task。
 
 ## 6. 自分の言葉で説明
 
-<!-- 「EventBridgeとStep Functionsの役割の違い」を説明する -->
+<!-- 一言説明、30秒説明、採用理由を自分で書く -->
 
 ## 7. 理解確認
 
-### 到達目標
-
-イベント配信と処理手順の制御を区別し、EventBridgeとStep Functionsを使い分けられる。
-
-### 現在の理解度
-
-<!-- A：説明できる / B：見れば分かる / C：まだ怪しい -->
+<!-- 判断問題への回答、疑問、理解度（A/B/C）を残す -->

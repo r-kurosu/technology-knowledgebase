@@ -163,82 +163,8 @@ if message.tool_calls:
 
 ## 6. ツール設計のベストプラクティス
 
-### 良いツール定義の条件
-1. **`description` が明確** — モデルはdescriptionを見てツールを選ぶ
-2. **パラメータ名が直感的** — `user_id` > `id`
-3. **各パラメータに `description` を記載**
-4. **enumで選択肢を制限**（自由入力より安定）
-5. **ツール数は適切に** — 多すぎると混乱（目安: 20個以下）
-
-### 悪い例
-```python
-{
-    "name": "process",
-    "description": "データを処理する",  # ← 曖昧すぎる
-    "parameters": {
-        "properties": {
-            "data": {"type": "string"},  # ← descriptionなし
-        }
-    }
-}
-```
-
-### 良い例
-```python
-{
-    "name": "search_products",
-    "description": "商品データベースを検索して、条件に合う商品リストを返す",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "query": {
-                "type": "string",
-                "description": "検索キーワード（例: 'ノートPC 軽量'）",
-            },
-            "max_price": {
-                "type": "integer",
-                "description": "最大価格（円）。指定なしの場合はnull",
-            },
-            "category": {
-                "type": "string",
-                "enum": ["electronics", "clothing", "books"],
-                "description": "商品カテゴリ",
-            },
-        },
-        "required": ["query", "max_price", "category"],
-        "additionalProperties": False,
-    },
-    "strict": True,
-}
-```
-
----
+<!-- 一言説明、30秒説明、採用理由を自分で書く -->
 
 ## 7. エラーハンドリング
 
-```python
-# ツール実行エラーをモデルに返す
-try:
-    result = execute_tool(tool_call)
-    content = json.dumps(result)
-except Exception as e:
-    content = json.dumps({
-        "error": str(e),
-        "success": False
-    })
-
-messages.append({
-    "role": "tool",
-    "tool_call_id": tool_call.id,
-    "content": content,  # エラー情報をモデルに渡す
-})
-```
-
-モデルはエラー情報を受け取って、再試行や代替手段を提案できる。
-
----
-
-## 参考リンク
-
-- [Function calling](https://platform.openai.com/docs/guides/function-calling)
-- [OpenAI Cookbook: How to call functions](https://cookbook.openai.com/examples/how_to_call_functions_with_chat_models)
+<!-- 判断問題への回答、疑問、理解度（A/B/C）を残す -->

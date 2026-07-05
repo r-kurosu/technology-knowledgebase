@@ -24,14 +24,8 @@ RDS Multi-AZ、Aurora Global Database、DynamoDB Global Tables、S3 Cross-Region
 
 ## 6. 自分の言葉で説明
 
-<!-- 「Multi-AZとMulti-Regionの違い」を説明する -->
+<!-- 一言説明、30秒説明、採用理由を自分で書く -->
 
 ## 7. 理解確認
 
-### 到達目標
-
-想定する障害範囲からAZ内、Multi-AZ、Multi-Regionの構成を使い分けられる。
-
-### 現在の理解度
-
-<!-- A：説明できる / B：見れば分かる / C：まだ怪しい -->
+<!-- 判断問題への回答、疑問、理解度（A/B/C）を残す -->

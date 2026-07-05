@@ -105,48 +105,8 @@ for part in response.candidates[0].content.parts:
 
 ## 6. 他プロバイダーの推論モードとの比較
 
-| | Gemini 3 | Claude（Extended Thinking） | OpenAI（o シリーズ） |
-|---|---|---|---|
-| 制御方法 | `thinking_level` (minimal/low/medium/high) | `budget_tokens` / `thinking.effort` | モデル選択（o3/o4-mini等） |
-| デフォルト | **Dynamic（自動調整）** | 明示的に有効化が必要 | 推論モデルは常時on |
-| 思考内容の参照 | 部分的に可 | ✅ `thinking` ブロックで確認可 | ❌ 内部非公開 |
-| 通常モデルとの統合 | ✅ 同一モデルでon/off | ✅ 同一モデルでon/off | ❌ 別モデルが必要 |
-
-**Geminiの強み**: 同一モデルで思考量をシームレスに調整できる。  
-**Claudeの強み**: 思考内容（thinking blocks）を確認・デバッグできる。
-
----
+<!-- 一言説明、30秒説明、採用理由を自分で書く -->
 
 ## 7. 使い分けガイド
 
-```
-タスクの種類で考える:
-
-単純 → thinking_level: "minimal"
-  ・翻訳
-  ・要約
-  ・定型文生成
-
-標準 → thinking_level: "low" or Dynamic
-  ・質問回答
-  ・データ抽出
-  ・コード補完
-
-複雑 → thinking_level: "medium" or "high"
-  ・バグの原因調査
-  ・アーキテクチャ設計
-  ・論文・レポートの批評
-
-非常に複雑 → thinking_level: "high"
-  ・数学的証明
-  ・複雑なデバッグ（大規模コードベース）
-  ・多段階の戦略立案
-```
-
----
-
-## 参考リンク
-
-- [Thinking Mode Guide](https://ai.google.dev/gemini-api/docs/thinking)
-- [Gemini 3 Developer Guide](https://ai.google.dev/gemini-api/docs/gemini-3)
-- [Gemini 3.1 Pro Preview](https://ai.google.dev/gemini-api/docs/models/gemini-3.1-pro-preview)
+<!-- 判断問題への回答、疑問、理解度（A/B/C）を残す -->

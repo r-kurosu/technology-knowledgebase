@@ -117,70 +117,8 @@ model = GenerativeModel("gemini-2.5-flash@latest")
 
 ## 6. Vertex AI固有の機能
 
-### Fine-tuning（Supervised Fine-tuning）
-
-```python
-from google.cloud import aiplatform
-
-# チューニングジョブの作成
-job = aiplatform.CustomTrainingJob(
-    display_name="gemini-finetuning",
-    script_path="training_script.py",
-)
-```
-
-### Model Garden
-
-Vertex AIコンソールから以下にアクセス可能:
-- Gemini全モデル
-- Llama, Mistral, Code Llama等のOSSモデル
-- Anthropic Claude（Vertex AI経由でも利用可能）
-
-### Batch Prediction
-
-```python
-from vertexai.generative_models import GenerativeModel
-
-# バッチ処理（大量リクエスト向け、低コスト）
-# BigQueryまたはCloud Storageに入力・出力を指定
-```
-
----
+<!-- 一言説明、30秒説明、採用理由を自分で書く -->
 
 ## 7. リージョン選択
 
-```python
-# 推奨リージョン（東京最寄り）
-vertexai.init(project="my-project", location="asia-northeast1")  # 東京
-
-# 他の主要リージョン
-# "us-central1"      # アイオワ（デフォルト・最新機能が先行）
-# "europe-west4"     # オランダ
-# "asia-southeast1"  # シンガポール
-```
-
-> 最新モデル・機能は `us-central1` で先行公開されることが多い。
-
----
-
-## 8. Azure OpenAI との対比
-
-| 比較軸 | Vertex AI (Gemini) | Azure OpenAI (GPT) |
-|---|---|---|
-| 基盤クラウド | Google Cloud (GCP) | Microsoft Azure |
-| モデル | Gemini 2.5/3 系 | GPT-5.4 系 |
-| 認証 | Service Account / Workload Identity | Azure AD / Managed Identity |
-| VPC | ✅ VPC Service Controls | ✅ Private Endpoint |
-| コンプライアンス | HIPAA, ISO 27001 等 | HIPAA, SOC 2, ISO 等 |
-| Fine-tuning | ✅ SFT | ✅ SFT |
-| リージョン | グローバル | Azure リージョン（日本東/西） |
-
----
-
-## 参考リンク
-
-- [Vertex AI Generative AI Docs](https://cloud.google.com/vertex-ai/generative-ai/docs)
-- [Vertex AI SDK for Python](https://cloud.google.com/vertex-ai/docs/python-sdk/use-vertex-ai-python-sdk)
-- [Authentication Guide](https://cloud.google.com/docs/authentication)
-- [Vertex AI Pricing](https://cloud.google.com/vertex-ai/generative-ai/pricing)
-- [Model Garden](https://cloud.google.com/vertex-ai/generative-ai/docs/model-garden/explore-models)
+<!-- 判断問題への回答、疑問、理解度（A/B/C）を残す -->

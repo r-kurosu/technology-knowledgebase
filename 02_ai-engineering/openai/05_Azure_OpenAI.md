@@ -122,55 +122,8 @@ Azureポータルの「Content filters」でカテゴリごとの閾値を調整
 
 ## 6. 環境変数の標準化
 
-```bash
-# .env または Azure Key Vault で管理
-AZURE_OPENAI_ENDPOINT=https://my-resource.openai.azure.com/
-AZURE_OPENAI_API_KEY=xxxxxxxxxxxxxxxx
-AZURE_OPENAI_DEPLOYMENT=my-gpt5-deployment
-AZURE_OPENAI_API_VERSION=2024-10-21
-```
-
-```python
-import os
-from openai import AzureOpenAI
-
-client = AzureOpenAI(
-    api_key=os.environ["AZURE_OPENAI_API_KEY"],
-    api_version=os.environ["AZURE_OPENAI_API_VERSION"],
-    azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
-)
-
-DEPLOYMENT = os.environ["AZURE_OPENAI_DEPLOYMENT"]
-
-response = client.chat.completions.create(
-    model=DEPLOYMENT,
-    messages=[...],
-)
-```
-
----
+<!-- 一言説明、30秒説明、採用理由を自分で書く -->
 
 ## 7. LiteLLM 経由でのAzure OpenAI利用
 
-OpenAIコードをほぼそのままAzure OpenAIに向けたい場合、LiteLLMが便利。
-
-```python
-import litellm
-
-response = litellm.completion(
-    model="azure/my-gpt5-deployment",  # "azure/" プレフィックス + デプロイ名
-    messages=[{"role": "user", "content": "hello"}],
-    api_base=os.environ["AZURE_OPENAI_ENDPOINT"],
-    api_version="2024-10-21",
-    api_key=os.environ["AZURE_OPENAI_API_KEY"],
-)
-```
-
----
-
-## 参考リンク
-
-- [Azure OpenAI Service ドキュメント](https://learn.microsoft.com/azure/ai-services/openai/)
-- [API バージョン一覧](https://learn.microsoft.com/azure/ai-services/openai/reference)
-- [Managed Identity で認証](https://learn.microsoft.com/azure/ai-services/openai/how-to/managed-identity)
-- [デプロイタイプの比較](https://learn.microsoft.com/azure/ai-services/openai/how-to/deployment-types)
+<!-- 判断問題への回答、疑問、理解度（A/B/C）を残す -->

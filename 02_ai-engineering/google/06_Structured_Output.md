@@ -136,55 +136,8 @@ class Person(BaseModel):
 
 ## 6. 配列レスポンス（リスト抽出）
 
-```python
-from typing import List
-
-class MenuItem(BaseModel):
-    name: str
-    price_jpy: int
-    category: str
-
-# 複数アイテムのリスト抽出
-response = model.generate_content(
-    f"以下のメニュー表からすべてのアイテムを抽出して:\n\n{menu_text}",
-    generation_config=GenerationConfig(
-        response_mime_type="application/json",
-        response_schema=List[MenuItem],  # リスト型を直接指定
-    ),
-)
-
-items = json.loads(response.text)  # list of dicts
-```
-
----
+<!-- 一言説明、30秒説明、採用理由を自分で書く -->
 
 ## 7. Function Calling との使い分け
 
-| | Structured Output | Function Calling |
-|---|---|---|
-| 用途 | **最終回答**をスキーマ準拠で返す | **中間ステップ**で外部ツール/データを呼ぶ |
-| 外部実行 | なし | あり |
-| 典型例 | データ抽出・分類・フォーム入力 | 検索・DB照会・API呼び出し |
-
-```
-[Structured Output] テキスト → モデル → スキーマ準拠JSON
-[Function Calling]  テキスト → モデル → 関数呼び出し → 実行 → モデル → テキスト
-```
-
----
-
-## 8. 他プロバイダーとの比較
-
-| 項目 | Gemini | OpenAI | Anthropic |
-|---|---|---|---|
-| スキーマ強制 | `response_schema` | `response_format.json_schema` (`strict: true`) | `output_config.format` |
-| JSON mode（スキーマなし） | `response_mime_type: "application/json"` | `response_format: {type: "json_object"}` | なし |
-| Pydantic連携 | ✅ 直接渡せる | ✅ `.parse()` メソッド | ✅ Pydantic対応 |
-| 列挙型のEnum | ✅ | ✅ | ✅ |
-
----
-
-## 参考リンク
-
-- [Structured Output Guide](https://ai.google.dev/gemini-api/docs/structured-output)
-- [JSON Schema Reference](https://json-schema.org/)
+<!-- 判断問題への回答、疑問、理解度（A/B/C）を残す -->

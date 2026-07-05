@@ -132,48 +132,8 @@ print(response.choices[0].message.content)
 
 ## 6. 評価と品質管理
 
-```python
-# バリデーションデータを指定して客観的評価
-job = client.fine_tuning.jobs.create(
-    training_file="file-training-xxxx",
-    validation_file="file-validation-xxxx",  # 学習に使わない評価用データ
-    model="gpt-4o-mini"
-)
-# ジョブイベントで validation_loss を確認
-```
-
-### 評価の観点
-1. **トレーニングロスの低下**: 収束しているか
-2. **バリデーションロス**: 過学習していないか（training loss と乖離したら過学習）
-3. **人間評価**: 実際のユースケースでの品質確認
-
----
+<!-- 一言説明、30秒説明、採用理由を自分で書く -->
 
 ## 7. コスト
 
-Fine-tuning のコスト構造：
-
-| フェーズ | 料金 |
-|---------|------|
-| 学習（Training） | モデル・トークン数に依存（例: gpt-4o-mini は $3/1M tokens） |
-| 推論（Inference） | ベースモデルより高い場合が多い |
-
-**コスト計算**: `(データセットのトークン数) × n_epochs × 学習料金`
-
----
-
-## 8. Anthropicとの比較
-
-| 観点 | OpenAI Fine-tuning | Anthropic |
-|------|-------------------|-----------|
-| 対応モデル | gpt-4o-mini, gpt-4.1-nano 等 | Fine-tuning API 非公開（2026年時点） |
-| データ形式 | JSONL | - |
-| 代替手段 | - | プロンプトエンジニアリング・RAGで対応 |
-
----
-
-## 参考リンク
-
-- [Fine-tuning ガイド](https://platform.openai.com/docs/guides/fine-tuning)
-- [Fine-tuning API リファレンス](https://platform.openai.com/docs/api-reference/fine-tuning)
-- [Supervised fine-tuning ガイド](https://platform.openai.com/docs/guides/supervised-fine-tuning)
+<!-- 判断問題への回答、疑問、理解度（A/B/C）を残す -->

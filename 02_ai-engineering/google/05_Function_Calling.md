@@ -130,65 +130,8 @@ for part in response.candidates[0].content.parts:
 
 ## 6. 内蔵ツール（Built-in Tools）
 
-コード記述不要で使える組み込みツール。
-
-### Google Search Grounding
-
-```python
-model = genai.GenerativeModel(
-    model_name="gemini-2.5-flash",
-    tools=[genai.protos.Tool(google_search=genai.protos.GoogleSearch())]
-)
-
-response = model.generate_content("2026年4月の最新AIニュースを教えて")
-
-# 検索ソースの確認
-for chunk in response.candidates[0].grounding_metadata.grounding_chunks:
-    print(chunk.web.uri, chunk.web.title)
-```
-
-### Code Execution（コード実行）
-
-```python
-model = genai.GenerativeModel(
-    model_name="gemini-2.5-flash",
-    tools=[genai.protos.Tool(code_execution=genai.protos.ToolCodeExecution())]
-)
-
-response = model.generate_content(
-    "1から100の素数をすべて求めて、その合計も出して"
-)
-# モデルがPythonコードを書いて実行し、結果を返す
-```
-
-### Google Maps Grounding（Gemini 2.5 Pro）
-
-```python
-model = genai.GenerativeModel(
-    model_name="gemini-2.5-pro",
-    tools=[genai.protos.Tool(google_maps=genai.protos.GoogleMaps())]
-)
-
-response = model.generate_content("東京駅から新宿駅までのルートを教えて")
-```
-
----
+<!-- 一言説明、30秒説明、採用理由を自分で書く -->
 
 ## 7. 他プロバイダーとの比較
 
-| 項目 | Gemini | OpenAI | Anthropic |
-|---|---|---|---|
-| ツール定義 | `FunctionDeclaration` + `Schema` | `tools[].function.parameters` | `tools[].input_schema` |
-| 結果返却 | `FunctionResponse` part | `{"role": "tool", ...}` | `{"type": "tool_result", ...}` |
-| モード制御 | `AUTO/ANY/NONE/VALIDATED` | `"auto"/"required"/"none"` | `"auto"/"any"/"none"` |
-| 内蔵ツール | Google Search, Code Execution, Maps | Web Search（別途） | Web Search（別途） |
-| Strict mode | `VALIDATED`（Gemini 3） | `strict: true` | `strict: true` |
-
----
-
-## 参考リンク
-
-- [Function Calling Guide](https://ai.google.dev/gemini-api/docs/function-calling)
-- [Tools Reference](https://ai.google.dev/gemini-api/docs/tools)
-- [Code Execution](https://ai.google.dev/gemini-api/docs/code-execution)
-- [Grounding with Google Search](https://ai.google.dev/gemini-api/docs/grounding)
+<!-- 判断問題への回答、疑問、理解度（A/B/C）を残す -->

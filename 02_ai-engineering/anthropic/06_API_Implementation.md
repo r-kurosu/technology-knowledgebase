@@ -292,44 +292,8 @@ response = client.messages.create(
 
 ## 6. エラーハンドリング
 
-```python
-import anthropic
-from anthropic import APIError, RateLimitError, APIConnectionError
-
-client = anthropic.Anthropic()
-
-try:
-    response = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=1024,
-        messages=[{"role": "user", "content": "こんにちは"}]
-    )
-except RateLimitError:
-    print("レート制限: リトライが必要")
-except APIConnectionError:
-    print("接続エラー: ネットワーク確認")
-except APIError as e:
-    print(f"APIエラー: {e.status_code} - {e.message}")
-```
-
----
+<!-- 一言説明、30秒説明、採用理由を自分で書く -->
 
 ## 7. よく使うパターンまとめ
 
-| パターン | 用途 | ポイント |
-|---------|------|---------|
-| 基本 messages | 単発の質問・生成 | `stop_reason` で完了確認 |
-| マルチターン | チャットボット | messages 配列を累積 |
-| tool_use ループ | エージェント | `stop_reason == "tool_use"` でループ継続 |
-| ストリーミング | UXの改善 | `client.messages.stream()` |
-| プロンプトキャッシング | コスト削減 | 変化しない部分に `cache_control` |
-
----
-
-## 参考リンク
-
-- [Messages API リファレンス](https://docs.anthropic.com/en/api/messages)
-- [Tool Use 実装ガイド](https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/implement-tool-use)
-- [ストリーミング](https://docs.anthropic.com/en/api/messages-streaming)
-- [プロンプトキャッシング](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching)
-- [Anthropic Python SDK (GitHub)](https://github.com/anthropics/anthropic-sdk-python)
+<!-- 判断問題への回答、疑問、理解度（A/B/C）を残す -->

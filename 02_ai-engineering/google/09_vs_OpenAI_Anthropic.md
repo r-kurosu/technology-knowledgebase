@@ -72,82 +72,8 @@
 
 ## 6. Function Calling / Tool Use
 
-| 項目 | Gemini | OpenAI | Anthropic |
-|---|---|---|---|
-| ツール定義 | `FunctionDeclaration` + `Schema` | `tools[].function` | `tools[].input_schema` |
-| 呼び出しモード | AUTO/ANY/NONE/VALIDATED | auto/required/none | auto/any/none |
-| 並列呼び出し | ✅ | ✅ | ✅ |
-| 内蔵ツール | **Google Search, Code Execution, Maps** | Web Search（別途） | Web Search（別途） |
-| Strict mode | VALIDATED（Gemini 3） | `strict: true` | `strict: true` |
-
-**Geminiの強み**: Google SearchグラウンディングとCode ExecutionがネイティブビルトインでHTTP呼び出し不要。
-
----
+<!-- 一言説明、30秒説明、採用理由を自分で書く -->
 
 ## 7. 構造化出力
 
-| 項目 | Gemini | OpenAI | Anthropic |
-|---|---|---|---|
-| スキーマ強制 | `response_schema` | `response_format.json_schema` (`strict: true`) | `output_config.format` |
-| JSON mode | `response_mime_type: "application/json"` | `{type: "json_object"}` | なし |
-| Pydantic連携 | ✅ 直接渡せる | ✅ `.parse()` | ✅ |
-
----
-
-## 8. コスト最適化
-
-| 機能 | Gemini | OpenAI | Anthropic |
-|---|---|---|---|
-| Prompt Caching | ✅ Context Caching API（明示的） | ✅ 自動キャッシュ（OpenAI管理） | ✅ Prompt Caching（`cache_control`） |
-| Batch API | ✅ | ✅ （50%割引） | ✅ （50%割引） |
-| キャッシュ割引率 | 〜75%割引 | 〜50%割引 | 〜90%割引 |
-
----
-
-## 9. エンタープライズ展開
-
-| 項目 | Vertex AI（Google） | Azure OpenAI（Microsoft） | Claude on AWS/GCP（Anthropic） |
-|---|---|---|---|
-| クラウド基盤 | GCP | Azure | AWS Bedrock / Vertex AI |
-| 認証 | Service Account | Azure AD | IAM Role |
-| VPC | ✅ | ✅ | ✅ |
-| Fine-tuning | ✅ | ✅ | 限定的 |
-
----
-
-## 10. 実務での選択指針
-
-```
-長文ドキュメント処理（1M tokens）
-  → Gemini 2.5 Pro / gpt-5.4
-
-動画・音声・PDF処理
-  → Gemini（ダントツ優位）
-
-厳密な推論・数学・コード
-  → Gemini 3 (thinking high) / Claude Extended Thinking / GPT o系
-
-安全性・倫理的な回答品質
-  → Anthropic Claude（コンスティテューショナルAI）
-
-OpenAIからの移行コスト最小化
-  → Gemini（OpenAI互換エンドポイントあり）
-
-GCPエコシステム内で完結したい
-  → Vertex AI (Gemini)
-
-AzureエコシステムのエンタープライズAI
-  → Azure OpenAI
-
-マルチプロバイダー統一インターフェース
-  → LiteLLM
-```
-
----
-
-## 参考リンク
-
-- [Gemini API Docs](https://ai.google.dev/gemini-api/docs)
-- [OpenAI Platform Docs](https://platform.openai.com/docs)
-- [Anthropic Docs](https://docs.anthropic.com)
-- [LiteLLM（マルチプロバイダー対応）](https://docs.litellm.ai)
+<!-- 判断問題への回答、疑問、理解度（A/B/C）を残す -->
