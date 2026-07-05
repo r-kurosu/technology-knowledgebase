@@ -203,6 +203,130 @@ agent = Agent(
 )
 ```
 
+### カスタムツールの定義（`@function_tool`）
+
+`@function_tool` デコレータで Python 関数をエージェントが呼べるツールに変換できる。  
+型ヒントと docstring を書くだけで JSON スキーマが自動生成される。
+
+```python
+from agents import Agent, Runner, function_tool
+
+@function_tool
+def get_weather(city: str) -> str:
+    """指定した都市の現在の天気を返す。"""
+    # 実際は外部API呼び出しなど
+    return f"{city}: 晴れ、25°C"
+
+@function_tool
+def send_email(to: str, subject: str, body: str) -> str:
+    """メールを送信する。"""
+    # 実際はメール送信ロジック
+    return f"{to} にメール送信完了"
+
+agent = Agent(
+    name="アシスタント",
+    instructions="ユーザーの依頼を処理する",
+    tools=[get_weather, send_email],
+)
+
+result = Runner.run_sync(agent, "東京の天気を教えて")
+print(result.final_output)
+```
+
+### コンテキスト変数（`RunContext`）
+
+エージェントをまたぐ共有状態を TypedDict + `RunContextWrapper` で渡す。
+
+```python
+from dataclasses import dataclass
+from agents import Agent, Runner, RunContextWrapper, function_tool
+
+@dataclass
+class AppContext:
+    user_id: str
+    plan: str  # "free" | "pro" | "enterprise"
+
+@function_tool
+def check_quota(ctx: RunContextWrapper[AppContext]) -> str:
+    """ユーザーのクォータを確認する。"""
+    if ctx.context.plan == "free":
+        return "残り: 10リクエスト/日"
+    return "無制限"
+
+agent = Agent(
+    name="サポートエージェント",
+    tools=[check_quota],
+)
+
+ctx = AppContext(user_id="u123", plan="pro")
+result = Runner.run_sync(agent, "今月の使用量は？", context=ctx)
+```
+
+### 非同期実行（`Runner.run`）
+
+`Runner.run_sync` は内部で `asyncio.run()` を呼ぶ同期ラッパー。  
+既存の async コードや FastAPI などと組み合わせるときは `Runner.run`（非同期）を使う。
+
+```python
+import asyncio
+from agents import Agent, Runner
+
+agent = Agent(name="アシスタント", instructions="役に立つアシスタント")
+
+async def handle_request(user_input: str) -> str:
+    result = await Runner.run(agent, user_input)
+    return result.final_output
+
+# FastAPI との組み合わせ例
+from fastapi import FastAPI
+app = FastAPI()
+
+@app.post("/chat")
+async def chat(message: str) -> dict:
+    output = await handle_request(message)
+    return {"response": output}
+```
+
+### ストリーミング（`Runner.run_streamed`）
+
+```python
+from agents import Runner
+
+async def stream_response(agent, user_input: str):
+    async with Runner.run_streamed(agent, user_input) as stream:
+        async for event in stream.stream_events():
+            if event.type == "raw_response_event":
+                delta = event.data.delta
+                if hasattr(delta, "text"):
+                    print(delta.text, end="", flush=True)
+```
+
+### トレーシング
+
+`openai-agents` はデフォルトで全実行トレースを OpenAI の Dashboard に記録する。  
+無効化やカスタムエクスポートも可能。
+
+```python
+from agents import set_tracing_disabled
+
+# トレース無効化（本番でコストを下げたい場合など）
+set_tracing_disabled(True)
+```
+
+### Anthropic Agents SDK との比較
+
+| 比較軸 | OpenAI Agents SDK (`openai-agents`) | Anthropic Managed Agents |
+|---|---|---|
+| **ホスティング** | 自分でホスト（SDK がループを管理） | Anthropic がコンテナをホスト |
+| **ループ管理** | SDK（`Runner`）が自動管理 | Anthropic サーバーが管理 |
+| **ツール定義** | `@function_tool` デコレータ | API スキーマ or `agent_toolset` |
+| **ファイルシステム** | 自前で用意 | 自動プロビジョニング（session ごと） |
+| **状態管理** | `RunContext` で引数渡し | Session で自動管理 |
+| **マルチエージェント** | `handoffs` で宣言的に | Orchestrator パターン（手動） |
+| **ガードレール** | `@input_guardrail`/`@output_guardrail` | プロンプトエンジニアリング主体 |
+| **トレーシング** | 標準搭載（OpenAI Dashboard） | Claude.ai コンソール |
+| **向いているケース** | 自前インフラ上で細かく制御したい | すばやく本番稼動させたい |
+
 ---
 
 ## 5. Responses API vs Chat Completions: 使い分け
