@@ -94,23 +94,23 @@ async def main():
 
 ## 設定：`ClaudeAgentOptions` 主要フィールド
 
-| フィールド | 用途 |
-|---|---|
-| `system_prompt` | システムプロンプト。文字列 or プリセット `{"type": "preset", "preset": "claude_code", "append": "..."}` |
-| `allowed_tools` / `disallowed_tools` | 事前承認するツール / ブロックするツール（`"Bash(rm *)"` のようなパターン可） |
-| `tools` | 使えるツールの集合。プリセット `{"type": "preset", "preset": "claude_code"}` も可 |
-| `permission_mode` | `default` / `acceptEdits` / `plan` / `dontAsk` / `bypassPermissions` |
-| `can_use_tool` | ツール実行の可否をコールバックで判定（後述） |
-| `mcp_servers` | MCP サーバー定義（stdio / sse / in-process） |
-| `agents` | サブエージェント定義（`AgentDefinition`） |
-| `hooks` | ライフサイクルフック |
-| `skills` | 有効化する Agent Skills（`"all"` / 名前リスト / `[]`） |
-| `setting_sources` | `.claude/` 設定の読み込み元（`user` / `project` / `local`） |
-| `cwd` / `add_dirs` | 作業ディレクトリ / 追加アクセス許可ディレクトリ |
-| `model` / `fallback_model` | モデル（`"sonnet"` / `"opus"` 等のエイリアス、or `claude-opus-4-8`） |
-| `thinking` / `effort` | 思考設定。`{"type": "adaptive"}` + `effort="high"`（`low`〜`max`, `xhigh`）を推奨 |
-| `resume` / `fork_session` / `continue_conversation` | セッション再開 / 分岐 / 継続 |
-| `max_turns` / `max_budget_usd` | ターン数上限 / コスト上限 |
+| フィールド                                               | 用途                                                                                    |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `system_prompt`                                     | システムプロンプト。文字列 or プリセット `{"type": "preset", "preset": "claude_code", "append": "..."}` |
+| `allowed_tools` / `disallowed_tools`                | 事前承認するツール / ブロックするツール（`"Bash(rm *)"` のようなパターン可）                                       |
+| `tools`                                             | 使えるツールの集合。プリセット `{"type": "preset", "preset": "claude_code"}` も可                      |
+| `permission_mode`                                   | `default` / `acceptEdits` / `plan` / `dontAsk` / `bypassPermissions`                  |
+| `can_use_tool`                                      | ツール実行の可否をコールバックで判定（後述）                                                                |
+| `mcp_servers`                                       | MCP サーバー定義（stdio / sse / in-process）                                                  |
+| `agents`                                            | サブエージェント定義（`AgentDefinition`）                                                         |
+| `hooks`                                             | ライフサイクルフック                                                                            |
+| `skills`                                            | 有効化する Agent Skills（`"all"` / 名前リスト / `[]`）                                            |
+| `setting_sources`                                   | `.claude/` 設定の読み込み元（`user` / `project` / `local`）                                     |
+| `cwd` / `add_dirs`                                  | 作業ディレクトリ / 追加アクセス許可ディレクトリ                                                             |
+| `model` / `fallback_model`                          | モデル（`"sonnet"` / `"opus"` 等のエイリアス、or `claude-opus-4-8`）                               |
+| `thinking` / `effort`                               | 思考設定。`{"type": "adaptive"}` + `effort="high"`（`low`〜`max`, `xhigh`）を推奨                |
+| `resume` / `fork_session` / `continue_conversation` | セッション再開 / 分岐 / 継続                                                                     |
+| `max_turns` / `max_budget_usd`                      | ターン数上限 / コスト上限                                                                        |
 
 > **思考設定の注意**: 現行モデル（Opus 4.6+ / Sonnet 4.6）は adaptive thinking + `effort` が推奨。固定 `budget_tokens` は旧モデル向けのレガシー。
 
