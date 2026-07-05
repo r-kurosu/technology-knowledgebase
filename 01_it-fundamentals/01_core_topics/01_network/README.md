@@ -4,6 +4,7 @@
 
 ## 学習する順番
 
+0. [OSIモデルとTCP/IPモデル](00_osi_and_tcpip_model.md)
 1. [通信の基礎とIPアドレス](01_network_fundamentals_and_addressing.md)
 2. [ルーティングとインターネット接続](02_routing_and_internet_connectivity.md)
 3. [エンドツーエンド通信](03_end_to_end_communication.md)
