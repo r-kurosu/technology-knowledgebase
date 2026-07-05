@@ -4,7 +4,7 @@
 OpenAI が SDK 側でエージェントループを管理するため、手動ループ実装が不要。
 
 Responses API との使い分けは [06_Responses_API_and_Agents.md](06_Responses_API_and_Agents.md) 参照。  
-Anthropic Managed Agents との比較は [このファイルの末尾](#anthropic-managed-agents-との比較) 参照。
+Anthropic 側との比較は [このファイルの末尾](#anthropic-エージェント構築との比較) 参照（直接の対応物は Claude Agent SDK）。
 
 ---
 
@@ -206,21 +206,30 @@ set_tracing_disabled(True)
 
 ---
 
-## Anthropic Managed Agents との比較
+## Anthropic エージェント構築との比較
 
-| 比較軸 | OpenAI Agents SDK (`openai-agents`) | Anthropic Managed Agents |
+Anthropic には 2 系統ある。**直接の対応物は Claude Agent SDK**（どちらも自ホストで SDK がループを回すライブラリ）。Managed Agents は「Anthropic がループもサンドボックスも持つ」別カテゴリ。
+
+### OpenAI Agents SDK vs Claude Agent SDK（本来の対応）
+
+| 比較軸 | OpenAI Agents SDK (`openai-agents`) | Claude Agent SDK (`claude-agent-sdk`) |
 |---|---|---|
-| **ホスティング** | 自分でホスト（SDK がループを管理） | Anthropic がコンテナをホスト |
-| **ループ管理** | SDK（`Runner`）が自動管理 | Anthropic サーバーが管理 |
-| **ツール定義** | `@function_tool` デコレータ | API スキーマ or `agent_toolset` |
-| **ファイルシステム** | 自前で用意 | 自動プロビジョニング（session ごと） |
-| **状態管理** | `RunContext` で引数渡し | Session で自動管理 |
-| **マルチエージェント** | `handoffs` で宣言的に | Orchestrator パターン（手動） |
-| **ガードレール** | `@input_guardrail`/`@output_guardrail` | プロンプトエンジニアリング主体 |
-| **トレーシング** | 標準搭載（OpenAI Dashboard） | Claude.ai コンソール |
-| **向いているケース** | 自前インフラ上で細かく制御したい | すばやく本番稼動させたい |
+| **ホスティング** | 自分でホスト（SDK がループを管理） | 自分でホスト（SDK がループを管理） |
+| **ベース** | 汎用エージェントフレームワーク | Claude Code と同じハーネス（組み込みツール込み） |
+| **ワンショット/継続** | `Runner.run_sync()` / `Runner.run()` | `query()` / `ClaudeSDKClient` |
+| **ツール定義** | `@function_tool` デコレータ | `@tool` + `create_sdk_mcp_server` |
+| **組み込みツール** | 基本は自前（一部 hosted tool） | Read/Write/Bash/Grep 等が最初から |
+| **状態管理** | `RunContext` で引数渡し | セッション（`resume`/`fork`）+ ローカル JSONL |
+| **マルチエージェント** | `handoffs` で宣言的に | `agents`（`AgentDefinition`）+ `Agent` ツール |
+| **ガードレール/権限** | `@input_guardrail`/`@output_guardrail` | `permission_mode` / `can_use_tool` / hooks |
+| **ファイル系設定** | 無し（コードで完結） | `.claude/`（Skills・CLAUDE.md・commands） |
+| **トレーシング** | 標準搭載（OpenAI Dashboard） | hooks / セッション JSONL |
 
-→ Anthropic 側の詳細: [../anthropic/07_Claude_Agent_SDK.md](../anthropic/07_Claude_Agent_SDK.md)
+### Anthropic Managed Agents（サーバーホスト型・別カテゴリ）
+
+自前でサンドボックス/セッション基盤を運用せず本番エージェントを回したいとき。OpenAI Agents SDK とは実行モデルが異なる（Anthropic がコンテナをホスト、REST でイベント往復）。
+
+→ Anthropic 側の詳細（両系統）: [../anthropic/07_Claude_Agent_SDK.md](../anthropic/07_Claude_Agent_SDK.md)
 
 ---
 
