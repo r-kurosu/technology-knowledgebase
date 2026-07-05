@@ -309,11 +309,15 @@ options = ClaudeAgentOptions(
 
 ## Client SDK（生 Messages API）との違い
 
+Client SDK = `anthropic` パッケージ（`client.messages.create` を直接叩く生 API）。実装パターンは [06_API_Implementation.md](06_API_Implementation.md) 参照。
+
 | | Client SDK（`anthropic`） | Agent SDK（`claude-agent-sdk`） |
 |---|---|---|
 | ツールループ | **自分で実装**（`while stop_reason == "tool_use"`） | Claude が自律的に処理 |
 | 組み込みツール | 無し（自前） | Read/Write/Bash/Grep 等が最初から |
 | 用途 | 単発呼び出し・細かい制御 | ファイルを触るエージェント |
+
+> **3 段の位置づけ**: 生 Messages API（[06](06_API_Implementation.md)、自分でループ）→ Claude Agent SDK（Part A、ローカルでループ自動）→ Managed Agents（Part B、サーバーでループ自動）。下ほど自前実装が減る。
 
 ---
 ---
