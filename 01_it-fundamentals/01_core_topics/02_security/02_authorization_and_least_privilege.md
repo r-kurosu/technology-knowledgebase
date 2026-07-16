@@ -101,15 +101,91 @@ RBACは役割が少なく安定なとき、ABACはチーム・テナントが次
 
 ## 3. AWSでの実装例
 
-IAM Policy、Resource Policy、Permission Boundary、SCP、Access Analyzer。
+| サービス／仕組み | 役割 | 権限を「足す/絞る」 |
+|---|---|---|
+| **IAM Policy**（Identity-based） | 主体に権限を付与 | 足す |
+| **Resource Policy** | リソース側から主体に許可（クロスアカウント等） | 足す |
+| **Permission Boundary** | 特定の主体1つの権限上限 | 絞る（天井） |
+| **SCP** | アカウント／OU全体の権限上限 | 絞る（天井） |
+| **Access Analyzer** | 外部アクセス・未使用権限の検出、Policy生成／検証 | 監査・支援 |
+
+### SCP（Service Control Policy）
+AWS Organizations でアカウント／OU全体にかける天井。Permission Boundaryの「組織版」。
+- 付与はしない、上限を絞るだけ
+- アカウント内の全主体（IAM User・Role、**rootですら**）に効く
+- 設定は組織の管理者
+- 典型例：許可リージョン外を全Deny、CloudTrail無効化をDeny、危険操作を組織全体で禁止
+
+### Access Analyzer
+最小権限を仕組みで支えるツール。
+- **外部アクセスの検出**：Resource Policyを解析し、外部・公開に晒されたリソースを洗い出す
+- **未使用アクセスの検出**：一定期間使われていないRole・権限を可視化して削る
+- **Policy生成／検証**：CloudTrail履歴から必要権限を割り出しPolicy案を生成、書いたPolicyの過剰さ・文法をチェック
+
+### ガードレールの階層（全体像）
+1リクエストは、複数の層を全部通過し、かつどこにもDenyが無いときだけ許可される。
+
+```
+実効権限 = SCP ∩ Permission Boundary ∩ (Identity-based ∪ Resource-based)  −  どこかの明示Deny
+
+  SCP（組織の天井：管理者が設定、rootも超えられない）
+   └ Permission Boundary（委譲の天井：主体ごと）
+       └ Identity / Resource Policy（実際に許可を「足す」層）
+           └ 明示Deny があれば最優先で却下
+```
+
+権限を「足す」のは Identity / Resource Policy だけ。SCPとPermission Boundaryは上限であり、いくら書いても権限は増えない。この非対称性がポイント。
 
 ## 4. アーキテクチャ図
 
-<!-- Principal、Policy、Resourceの認可関係を表す -->
+### 認可の評価フロー
+
+```mermaid
+flowchart TD
+    Req["リクエスト<br/>（Principal が Action を Resource に）"] --> SCP{SCP で許可?<br/>組織の天井}
+    SCP -->|No| Deny["❌ 拒否"]
+    SCP -->|Yes| PB{Permission Boundary<br/>で許可?（設定時のみ）}
+    PB -->|No| Deny
+    PB -->|Yes| AllowCheck{Identity または<br/>Resource Policy に<br/>明示Allow?}
+    AllowCheck -->|No（暗黙拒否）| Deny
+    AllowCheck -->|Yes| ExpDeny{どこかに明示Deny?}
+    ExpDeny -->|Yes| Deny
+    ExpDeny -->|No| Permit["✅ 許可"]
+```
+
+天井（SCP → Permission Boundary）を通過 → 明示Allowがある → 明示Denyが無い、を全部満たしたときだけ許可に到達。1か所でも引っかかれば拒否。
 
 ## 5. 設計トレードオフ
 
-<!-- 管理しやすさ、柔軟性、過剰権限、組織単位の統制を考える -->
+### ① 権限モデル：RBAC vs ABAC
+| 観点 | RBAC寄り | ABAC寄り |
+|---|---|---|
+| 管理しやすさ | ◎ 誰が何を持つか一目瞭然 | △ タグ設計に依存し追いづらい |
+| 柔軟性・拡張 | △ 組み合わせ増でロール爆発 | ◎ タグを揃えるだけで拡張 |
+| 向く場面 | 役割が少なく安定 | テナント・チームが増え続ける |
+
+### ② 最小権限をどこまで攻めるか
+| | 厳格に絞る | 広めに与える |
+|---|---|---|
+| 過剰権限リスク | 低い | 高い（漏洩時のblast radius大） |
+| 運用負荷 | 高い（都度Policy調整） | 低い |
+
+現実解：広めに始め、Access Analyzerで未使用権限を削って締める（段階的最小化）。
+
+### ③ 組織統制：SCP等のガードレールを敷くか
+| | 敷く | 敷かない |
+|---|---|---|
+| 統制・事故防止 | ◎ rootでも危険操作を封じられる | × アカウントごとに事故りうる |
+| 現場の自由度 | △ 制約が増える | ◎ |
+| 初期コスト | 設計・例外対応が必要 | 無し |
+
+定石：禁止事項（リージョン制限・監査無効化防止等）だけ最小限SCPで固め、許可は各アカウントに委ねる。
+
+### ④ 過剰権限が生まれる典型パターン（設計ミス候補）
+- `*:*` や `s3:*` で雑に付与 → 使わない権限が残り続ける
+- 一時的に付けた強権限の外し忘れ
+- ワイルドカード `Resource: "*"` でリソースを絞っていない
+- Denyを保険で書かず、Allowの記述漏れだけに頼る
 
 ## 6. 自分の言葉で説明
 
