@@ -65,7 +65,39 @@ IAMは認可を4つの要素に分解する。
 
 ## 2. 選択肢の比較
 
-<!-- Identity-based/Resource-based Policy、Allow/Deny、RBAC/ABACを比較する -->
+（Allow / 明示Deny の評価ロジックはセクション1に記載）
+
+### Identity-based Policy vs Resource-based Policy
+
+同じ「許可」でも、Policyをどこに貼るかで2種類ある。
+
+| | Identity-based Policy | Resource-based Policy |
+|---|---|---|
+| 貼る場所 | 主体（User / Role / Group） | 対象リソース（S3バケット、SQS、KMSキー、Lambda等） |
+| 視点 | 「この主体は○○できる」 | 「この対象は、これらの主体に触らせる」 |
+| `Principal` 欄 | 無い（自分が主体で自明） | **必須**（誰に許すか書く） |
+| 主な用途 | 通常の権限付与 | クロスアカウント、公開範囲の制御 |
+
+- **同一アカウント内**：どちらか一方にAllowがあれば通る（和集合）
+- **クロスアカウント**：両方必要（渡す側のIdentity Policy＋受ける側のResource Policyの両方でAllow）。他アカウントのS3を読ませるには、相手バケットのバケットポリシーに自分のRoleを許可する。
+
+### RBAC vs ABAC
+
+「誰に何を許すか」の決め方の設計思想。
+
+| | RBAC（ロールベース） | ABAC（属性ベース） |
+|---|---|---|
+| 判定の基準 | 割り当てられたロール（役割） | 主体と対象の属性（タグ）＋条件 |
+| 例 | 「管理者」「閲覧者」ロールを作り人を割り当て | 「`team=blue` の人は `team=blue` のリソースだけ」 |
+| AWSでの実現 | Roleごとに個別Policy | Condition＋タグ（`aws:PrincipalTag` / `aws:ResourceTag`） |
+| 長所 | 直感的・監査しやすい | 組み合わせが増えてもPolicyが増えない |
+| 短所 | 組み合わせ爆発（ロール増殖） | パッと見で誰が何を触れるか読みにくい |
+
+**スケール差の具体例**：テナントが毎月増えるSaaSで「admin/editor/viewer」の3権限を管理する場合——
+- RBAC：テナントごとにリソースが違うため `3 × N テナント` 本のPolicyが必要（100社で300本）
+- ABAC：`aws:PrincipalTag/tenant == aws:ResourceTag/tenant` という自己参照条件の3本だけ。新テナントは主体とリソースに `tenant=xyz` タグを付けるだけでPolicy本数は増えない
+
+RBACは役割が少なく安定なとき、ABACはチーム・テナントが次々増えるときに効く。土台RBAC＋細部ABACの併用も多い。
 
 ## 3. AWSでの実装例
 
