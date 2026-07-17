@@ -20,6 +20,19 @@ CloudTrail・Config・GuardDutyは3つとも「何かを記録・チェックす
 
 CloudTrailが「監視カメラの録画」なら、GuardDutyは「その録画を見て異常に気づく警備員」に近い。
 
+### Security Hub：検知結果の集約
+
+GuardDuty・Config・Inspector・Macie・IAM Access Analyzerなど、検知系サービスが増えるほど「結果がバラバラで運用が大変・個別最適になる」問題が起きる。Security Hubは**新たに何かを検知するエンジンではなく**、各サービスの検知結果を**ASFF（AWS Security Finding Format）という共通形式に正規化して1箇所に集約するプラットフォーム**（加えてCISベンチマーク等への自動チェックも一部持つ）。
+
+### インシデント調査の流れ（GuardDuty→CloudTrail→Config→Security Hub）
+
+例：GuardDutyが「見慣れないIPからの異常なAPI呼び出し」を検知した場合
+
+1. **GuardDuty**: Findingで検知（きっかけ）
+2. **CloudTrail**: そのIAMユーザー/ロールが**他に何のAPIを呼んだか**を全履歴で追い、横展開（被害）の範囲を特定。※CloudTrailは通信の中身ではなく、あくまでAPI呼び出しの記録
+3. **Config**: 該当時間帯前後の**構成変更履歴（タイムライン）**を確認し、侵害による実害・改変箇所（新規IAMユーザー作成、SG変更など）を特定
+4. **Security Hub**: 上記の検知結果を集約し、他のFindingと合わせて優先度づけ
+
 ### 組織単位の統制：Organizations と Control Tower
 
 - **Organizations**: 複数アカウントを1つの組織としてまとめる基盤サービス。OU（組織単位）でアカウントをグループ化し、**SCP（Service Control Policy）**でOU配下アカウントの「できないこと」の上限を設定する。アカウントの管理者権限があってもSCPで禁止された操作は実行できない。加えて一括請求も可能。
