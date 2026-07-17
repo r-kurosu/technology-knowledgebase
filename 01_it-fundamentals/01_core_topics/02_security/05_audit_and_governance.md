@@ -73,15 +73,83 @@ GuardDuty・Config・Inspector・Macie・IAM Access Analyzerなど、検知系�
 
 ## 3. AWSでの実装例
 
-CloudTrail、AWS Config、Organizations、Control Tower、Security Hub、GuardDuty。
+### 概念 → AWSサービス対応表
+
+| 概念 | AWSサービス | 補足 |
+|---|---|---|
+| 行動証跡 | **CloudTrail** | 管理イベント/データイベントを記録。ログ保存先はS3。ログファイル整合性検証（改ざん検知用ダイジェストファイル）を有効化するのが実務上ほぼ必須 |
+| 構成状態＋コンプライアンス評価 | **AWS Config** | 記録対象リソースタイプを絞らないとConfiguration Item数に応じた課金が積み上がる。マネージドルールをまず使い、足りない部分だけカスタムルール |
+| 脅威検知 | **GuardDuty** | 有効化するだけで開始（追加インフラ不要）。誤検知が多い場合はSuppression Ruleで除外 |
+| 検知結果の集約 | **Security Hub** | 有効化時にセキュリティ標準（CIS AWS Foundations Benchmark等）を選択可能。GuardDuty/Config/Inspector等の統合は個別に有効化状況を確認する必要がある |
+| 複数アカウント管理の基盤 | Organizations | OU、SCP、一括請求 |
+| 自動化されたランディングゾーン | Control Tower | Account Factory、事前定義ガードレール |
+
+### 実装時の注意点（CloudTrail・Config・GuardDuty・Security Hub）
+
+- **CloudTrailのログ保存先バケットは、可能なら本番運用アカウントとは別（ログ専用アカウント）にする。** 同一アカウントだと、侵害されたアカウントの犯人が自分の証跡ログ自体を削除・改ざんできてしまうため
+- **Configは記録対象リソースタイプの絞り込みが重要。** 「全リソースタイプを記録」を無条件に選ぶとConfiguration Item数が膨らみ想定外のコストになりやすい
+- **GuardDutyは有効化するだけで動き出す**が、これ単体では「気づく」だけで「通知」はしない。EventBridge経由でSNS/Chatbot等に飛ばす設定を別途行わないと、誰にも届かない
+- **Security Hub自体も通知ツールではない。** findingsを集約・正規化する場所であり、実際に人に届けるにはSecurity HubからEventBridge経由で通知先に転送する設定が必要
 
 ## 4. アーキテクチャ図
 
-<!-- 複数アカウントの監査ログを集約する流れを表す -->
+### CloudTrail・Config・GuardDutyの検知結果がSecurity Hubに集約され、通知に届くまで
+
+```mermaid
+flowchart TD
+    subgraph Sources["ログ/イベントソース"]
+        API["AWS API呼び出し"]
+        VPCFlow["VPC Flow Logs"]
+        DNS["DNSログ"]
+    end
+
+    CT["CloudTrail<br/>（行動証跡）"]
+    CFG["AWS Config<br/>（構成状態＋評価）"]
+    GD["GuardDuty<br/>（脅威検知エンジン）"]
+    S3Log[("S3<br/>（ログ保存・ログ専用アカウント推奨）")]
+    SH["Security Hub<br/>（Findings集約・ASFF正規化）"]
+    EB["EventBridge"]
+    Notify["SNS / Chatbot等<br/>（通知）"]
+
+    API -->|"記録"| CT
+    CT -->|"証跡を保存"| S3Log
+    CT -->|"分析対象として提供"| GD
+    VPCFlow --> GD
+    DNS --> GD
+
+    API -->|"構成変化を記録"| CFG
+    CFG -->|"構成履歴を保存"| S3Log
+    CFG -->|"Config Rule評価結果（Finding）"| SH
+
+    GD -->|"Finding"| SH
+
+    SH -->|"集約・正規化"| EB
+    EB --> Notify
+```
+
+ポイントは右側の流れ：GuardDuty・ConfigのFindingはSecurity Hubに集まるが、Security Hub自体は通知ツールではないため、**EventBridge経由で明示的に転送設定をしない限り誰にも届かない**。「検知される」ことと「人が気づく」ことの間に、もう1段設定が必要。
 
 ## 5. 設計トレードオフ
 
-<!-- 保存期間、改ざん防止、検知速度、通知量、管理負荷を考える -->
+### ① 保存期間：コストと監査要件のバランス
+
+CloudTrailのログはS3に無期限保存できるがコストがかかる。コンプライアンス要件（業界・規制によって必要保持期間は異なる）に応じて、S3ライフサイクルルールで一定期間後に安価なストレージクラスへ移行するのが基本設計。Configの構成履歴も同様にリテンション期間を設定できる。「必要な期間だけ高コストの層に置き、それ以降は安価な層に落とす」という考え方は暗号化ノートのコスト最適化と同じ発想。
+
+### ② 改ざん防止：ログの信頼性をどう担保するか
+
+CloudTrailの**ログファイル整合性検証**（SHA-256ダイジェストファイル）を有効化すると、ログが後から改ざん・削除されていないかを検証できる。加えて、ログ保存先アカウントを本番運用アカウントと分離し、本番側からは削除できない権限設計にすることで、万一本番アカウントが侵害されても攻撃者が自分の証跡を消せないようにする。より強固にしたい場合はS3 Object Lock（WORM）も選択肢。
+
+### ③ 検知速度：リアルタイム性の違い
+
+GuardDutyは数分単位でFindingを生成する準リアルタイム型。Config Ruleは設定変更トリガー型なら比較的早いが、周期評価型のルールは評価間隔ぶんのラグが生じうる。CloudTrail自体には検知の仕組みがないため、特定のAPI呼び出しに即座に反応したい場合はEventBridgeでCloudTrailイベントを直接フックする必要がある。「今すぐ気づきたいか、後から追えれば十分か」で採用する仕組みが変わる。
+
+### ④ 通知量：ノイズとの戦い
+
+GuardDuty・Config Ruleの検知結果を無差別に通知へ流すと、重要度の低いものに埋もれて本当に重要な検知を見逃す。Security Hubの重要度（severity）でフィルタし、低重要度は自動アーカイブ、高重要度だけ通知するといったルーティング設計が必要になる。「検知すること」と「気づける形で届けること」は別の設計課題として扱う。
+
+### ⑤ 管理負荷：一元化しても消えないもの
+
+Security Hubで集約すれば見る場所は1つになるが、裏側の各サービス（Configのカスタムルール保守、GuardDutyのSuppression Rule調整など）の個別チューニングはなくならない。「ダッシュボードが1つになること」と「運用負荷がゼロになること」はイコールではない。
 
 ## 6. 自分の言葉で説明
 
