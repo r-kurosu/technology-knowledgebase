@@ -6,11 +6,12 @@ ITの基礎知識をMarkdownで体系化した学習ノート。
 
 | ディレクトリ | 内容 |
 |------------|------|
-| [`01_it-fundamentals/`](01_it-fundamentals/) | ネットワーク・セキュリティ・コンピュート・DB・分散システムなどIT基礎（10分野）＋応用トピック |
+| [`01_it-fundamentals/`](01_it-fundamentals/) | ネットワーク・セキュリティ・コンピュート・DB・分散システムなどIT基礎（10分野） |
 | [`02_ai-engineering/`](02_ai-engineering/) | Anthropic・OpenAI・Google のAPI・ベストプラクティスノート |
-| [`03_business-domains/`](03_business-domains/) | ERP・CRM・SCM・PLM などの業務ドメイン概念 |
-| [`04_sap/`](04_sap/) | SAPモジュール（FI-CO・MM・PP・SD・BDC） |
-| [`05_fde-roadmap/`](05_fde-roadmap/) | Forward Deployed Engineer スキル・学習ロードマップ |
+| [`03_data-engineering/`](03_data-engineering/) | データ基盤アーキテクチャ・収集/処理・保存/DWH・ガバナンス/運用 |
+| [`04_business-domains/`](04_business-domains/) | ERP・CRM・SCM・PLM などの業務ドメイン概念 |
+| [`05_sap/`](05_sap/) | SAPモジュール（FI-CO・MM・PP・SD・BDC） |
+| [`06_fde-roadmap/`](06_fde-roadmap/) | Forward Deployed Engineer スキル・学習ロードマップ |
 
 ## ブランチ
 
@@ -26,4 +27,4 @@ ITの基礎知識をMarkdownで体系化した学習ノート。
 3. `01_it-fundamentals/` から始める
 4. Claude Code と対話しながら各ノートを埋めていく
 
-詳細は [`01_it-fundamentals/00_learning_system/`](01_it-fundamentals/00_learning_system/) を参照。
+詳細は [`01_it-fundamentals/99_learning_system/`](01_it-fundamentals/99_learning_system/) を参照。

@@ -10,7 +10,3 @@ Claude / GPT / Gemini を実務で使う際の設計・実装パターンを、�
 | [anthropic/](anthropic/) | Claude API・Agent SDK・Claude Code（エージェント設計・プロンプト・ツール/MCP・コンテキスト管理・実装例） |
 | [openai/](openai/) | OpenAI / GPT API ベストプラクティス・Azure OpenAI・比較ノート |
 | [google/](google/) | Gemini API・Vertex AI・マルチモーダル・ロングコンテキスト |
-
-## 関連ノート
-
-- [01_it-fundamentals/02_applied_topics/02_rag_agent_architecture/](../01_it-fundamentals/02_applied_topics/02_rag_agent_architecture/) — RAG / Agent アーキテクチャ（IT基礎側の応用トピック）

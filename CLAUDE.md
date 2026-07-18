@@ -7,18 +7,18 @@ ITの基礎知識をMarkdownで体系化した学習ノート。個人用途。
 ルート直下は連番プレフィックス（`NN_`）で分野を並べる。今後の追加は末尾に採番。
 
 ```
-01_it-fundamentals/     # IT基礎
-  00_learning_system/   # 学習ルール・テンプレート
-  01_core_topics/       # ネットワーク・セキュリティ・コンピュート等（10分野）
-  02_applied_topics/    # データプラットフォーム・RAG/Agent等
+01_it-fundamentals/     # IT基礎：ネットワーク・セキュリティ・コンピュート等（10分野）
+  01_network/ ... 10_cost_optimization/
+  99_learning_system/   # 学習ルール・テンプレート（設定的な扱いのため末尾番号）
 02_ai-engineering/      # AIプロバイダー別のAPI・ベストプラクティスノート（anthropic/openai/google）
-03_business-domains/    # 業務ドメインの概念（ERP/CRM/SCM/PLM）
-04_sap/                 # SAP（業務ドメインを実装する具体システム）
-05_fde-roadmap/         # Forward Deployed Engineer ロールとして習得すべきスキル・学習ロードマップ
+03_data-engineering/    # データ基盤：アーキテクチャ・収集/処理・保存/DWH・ガバナンス/運用
+04_business-domains/    # 業務ドメインの概念（ERP/CRM/SCM/PLM）
+05_sap/                 # SAP（業務ドメインを実装する具体システム）
+06_fde-roadmap/         # Forward Deployed Engineer ロールとして習得すべきスキル・学習ロードマップ
 ```
 
-ノートのテンプレートは `01_it-fundamentals/00_learning_system/output_template.md`。
-AI利用の詳細ルールは `01_it-fundamentals/00_learning_system/ai_usage_rules.md`。
+ノートのテンプレートは `01_it-fundamentals/99_learning_system/output_template.md`。
+AI利用の詳細ルールは `01_it-fundamentals/99_learning_system/ai_usage_rules.md`。
 
 ## コンピュートに関する前提
 

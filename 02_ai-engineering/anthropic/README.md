@@ -26,7 +26,3 @@ Anthropic の Claude API・Agent SDK・Claude Code を実務で使う際のリ�
 
 - 拡張思考は `thinking: {type: "adaptive"}`（Adaptive Thinking）を使用。`budget_tokens` は Opus 4.6/Sonnet 4.6 で非推奨、Fable 5/Opus 4.7/4.8 で削除済み。
 - 構造化出力は `output_config.format`（旧 `output_format` は非推奨）。
-
-## 関連ノート
-
-- [../../it-fundamentals/02_applied_topics/02_rag_agent_architecture/](../../it-fundamentals/02_applied_topics/02_rag_agent_architecture/) — RAG / Agent アーキテクチャ（IT基礎側の応用トピック）
