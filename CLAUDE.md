@@ -11,7 +11,7 @@ ITの基礎知識をMarkdownで体系化した学習ノート。個人用途。
   01_network/ ... 10_cost_optimization/
   99_learning_system/   # 学習ルール・テンプレート（設定的な扱いのため末尾番号）
 02_ai-engineering/      # AIプロバイダー別のAPI・ベストプラクティスノート（anthropic/openai/google）
-03_data-engineering/    # データ基盤：アーキテクチャ・収集/処理・保存/DWH・ガバナンス/運用
+03_data-engineering/    # データエンジニアリング：Databricksを主題にLakehouse・Spark・ガバナンス等（9テーマ、AWSは対応・比較として登場）
 04_business-domains/    # 業務ドメインの概念（ERP/CRM/SCM/PLM）
 05_sap/                 # SAP（業務ドメインを実装する具体システム）
 06_fde-roadmap/         # Forward Deployed Engineer ロールとして習得すべきスキル・学習ロードマップ
