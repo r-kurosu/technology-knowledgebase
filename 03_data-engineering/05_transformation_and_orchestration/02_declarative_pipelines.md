@@ -1,18 +1,18 @@
-# 宣言的パイプライン
+# 宣言的な変換パイプライン
 
 ## 1. 概念理解
 
 ### 学ぶ範囲
 
-Lakeflow Declarative Pipelines（旧Delta Live Tables）の考え方、ストリーミングテーブルとマテリアライズドビュー、expectationsによる品質チェック、依存関係の自動解決。
+SQL中心・宣言的に変換を記述するという考え方、依存関係の自動解決、テスト・品質チェックの組み込み、命令的な実装との違い。
 
 ## 2. 選択肢の比較
 
-<!-- 宣言的パイプライン/notebook+Jobs/dbtを、記述量、品質管理、柔軟性で比較する -->
+<!-- 宣言的パイプライン（dbt等）と命令的なスクリプト+ジョブを、記述量、品質管理、柔軟性で比較する -->
 
 ## 3. Databricks/AWSでの実装例
 
-Lakeflow Declarative Pipelines、expectations、dbt on Databricks。
+OSS/SaaSならdbt。DatabricksならLakeflow Declarative Pipelines（旧Delta Live Tables）とexpectations。
 
 ## 4. アーキテクチャ図
 

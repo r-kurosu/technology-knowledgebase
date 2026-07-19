@@ -5,28 +5,28 @@
 ## 学習する順番
 
 1. [ETL/ELTとデータモデリング](01_etl_elt_and_data_modeling.md)
-2. [宣言的パイプライン](02_declarative_pipelines.md)
-3. [オーケストレーション](03_orchestration_and_jobs.md)
+2. [宣言的な変換パイプライン](02_declarative_pipelines.md)
+3. [オーケストレーション](03_orchestration.md)
 
 ## 全体のつながり
 
-1. ETL/ELTの違いと、メダリオン各層の変換責務、Gold層のモデリング（スタースキーマ）を理解する
-2. その変換を宣言的に記述する選択肢（Lakeflow Declarative Pipelines、dbt）を理解する
+1. ETL/ELTの違いと、層ごとの変換責務、分析用テーブルのモデリング（スタースキーマ、SCD）を理解する
+2. その変換を宣言的に記述する考え方（dbtに代表される）と、品質チェックの組み込みを理解する
 3. パイプライン全体の実行を、依存関係・トリガー・リトライ・バックフィルを含めて設計する
 
 ## 分類の境界
 
-- 取り込み（Bronzeまで）は 04_data_ingestion で扱い、ここではBronze以降の変換を扱う
-- パイプラインに埋め込む品質チェック（expectations）の考え方はここ、品質の監視・リネージは 07_governance_and_unity_catalog で扱う
-- ジョブが使うクラスタの管理・コストは 08_operations_and_cost で扱う
+- 取り込み（Bronzeまで）は 04_ingestion_and_streaming で扱い、ここではそれ以降の変換を扱う
+- パイプラインに埋め込む品質チェックの考え方はここ、品質の監視・リネージは 07_data_governance で扱う
+- ジョブが使うコンピュートの管理・コストは 08_operations_and_cost で扱う
 
 ## 主な実装例
 
-SQL/PySparkによるELT、Lakeflow Declarative Pipelines（旧Delta Live Tables）、Lakeflow Jobs（旧Workflows）、dbt。AWS側ではGlue、MWAA（Airflow）、Step Functionsが対応する。
+dbt（宣言的変換の代表）、Airflow（汎用オーケストレータ）。DatabricksならSQL/PySparkのELT、Lakeflow Declarative Pipelines（旧Delta Live Tables）、Lakeflow Jobs（旧Workflows）。AWSならGlue、MWAA、Step Functions。
 
 ## 到達目標
 
 - 「なぜ今はELTが主流なのか」を説明できる
-- スタースキーマとSCDを使ったGold層のモデリングを設計できる
+- スタースキーマとSCDを使った分析用テーブルのモデリングを設計できる
 - 命令的な実装と宣言的パイプラインを使い分けられる
 - 失敗時の再実行範囲とバックフィルを考慮したジョブ設計ができる
