@@ -13,3 +13,4 @@
 ## 関連
 
 - 基礎編: [認証とアイデンティティ](../../01_it-fundamentals/02_security/01_authentication_and_identity.md)
+- [05_network_and_edge_security](../05_network_and_edge_security/README.md) — ゼロトラストのネットワーク側の実装（SASE/ZTNA）

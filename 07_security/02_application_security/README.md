@@ -9,7 +9,7 @@
 - 依存関係の管理（SCA、SBOM、Dependabot/Renovateの運用）
 - CI/CDでの自動検査（SAST/DAST/シークレットスキャン）
 - Secure SDLC・脅威モデリング（STRIDE）
-- シークレット管理の実務（環境変数の落とし穴、Secrets Manager）
+- シークレット管理の実務（環境変数の落とし穴、Vault/Secrets Manager等のシークレット管理サービス）
 
 ## 関連
 

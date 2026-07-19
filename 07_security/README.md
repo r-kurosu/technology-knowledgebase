@@ -8,17 +8,19 @@
 
 1. [脅威と攻撃手法](01_threats_and_attacks/README.md) — 攻撃者は何を、どう狙うのか
 2. [アプリケーションセキュリティ](02_application_security/README.md) — 作る側の防御（セキュア開発）
-3. [クラウド・コンテナセキュリティ](03_cloud_and_container_security/README.md) — AWS/ECS前提の防御
-4. [アイデンティティとゼロトラスト](04_identity_and_zero_trust/README.md) — 境界防御からの転換
-5. [セキュリティ運用](05_security_operations/README.md) — 検知・対応・インシデントレスポンス
-6. [AIセキュリティ](06_ai_security/README.md) — LLM時代の新しい攻撃面
-7. [オフェンシブセキュリティ入門](07_offensive_security_basics/README.md) — 手を動かして攻撃者視点を体得する
+3. [クラウド・コンテナセキュリティ](03_cloud_and_container_security/README.md) — クラウド全般の防御（例はAWS中心）
+4. [アイデンティティとゼロトラスト](04_identity_and_zero_trust/README.md) — 境界防御からの転換（概念・プロトコル）
+5. [ネットワーク・エッジセキュリティ](05_network_and_edge_security/README.md) — SASE/ZTNA等、ゼロトラストのネットワーク実装
+6. [セキュリティ運用](06_security_operations/README.md) — 検知・対応・インシデントレスポンス
+7. [AIセキュリティ](07_ai_security/README.md) — LLM時代の新しい攻撃面
+8. [オフェンシブセキュリティ入門](08_offensive_security_basics/README.md) — 手を動かして攻撃者視点を体得する
 
 ## 全体の到達目標
 
 - 代表的な攻撃手法を、防御側の設計判断に接続して説明できる
 - Webアプリ・API・CI/CDパイプラインの脆弱性を指摘し、対策を提案できる
-- AWS（特にECS/コンテナ構成）のセキュリティ設計をレビューできる
+- クラウド環境（AWS等）とコンテナ構成のセキュリティ設計をレビューできる
+- SASE/ZTNAなど、ゼロトラストを実装するネットワークサービスの構成要素を説明できる
 - インシデント発生時の初動と、平時の検知の仕組みを説明できる
 - LLMを組み込んだシステム特有のリスクを評価できる
 
