@@ -15,6 +15,7 @@ ITの基礎知識をMarkdownで体系化した学習ノート。個人用途。
 04_business-domains/    # 業務ドメインの概念（ERP/CRM/SCM/PLM）
 05_sap/                 # SAP（業務ドメインを実装する具体システム）
 06_fde-roadmap/         # Forward Deployed Engineer ロールとして習得すべきスキル・学習ロードマップ
+07_security/            # セキュリティ専門編（01_it-fundamentals/02_security は基礎編、こちらは深掘り）
 ```
 
 ノートのテンプレートは `01_it-fundamentals/99_learning_system/output_template.md`。
