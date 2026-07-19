@@ -171,6 +171,58 @@ print(result)
 - `content[0].type == "text"` でループ終了を判定してはいけない。Claudeはテキストと tool_use を同時に返すことがある
 - `stop_reason == "tool_use"` でループ継続、`"end_turn"` で終了が正しいパターン（エージェントループの核心）
 
+### 3-3. Tool Runner（自動ツールループ・beta）
+
+3-2 の手動ループは SDK の **Tool Runner** で置き換えられる（Python SDK の beta 機能）。
+`@beta_tool` デコレータで関数をツール化すると、スキーマは型ヒント＋docstring から自動生成され、
+「API 呼び出し → ツール実行 → 結果返却 → ループ」を SDK が回してくれる。
+**カスタムツールだけのエージェントなら、手動ループよりこちらが公式推奨**。
+
+```python
+import anthropic
+from anthropic import beta_tool
+
+client = anthropic.Anthropic()
+
+@beta_tool
+def get_weather(city: str) -> str:
+    """指定した都市の現在の天気を取得する。
+
+    Args:
+        city: 都市名（例: 東京）
+    """
+    return '{"temperature": 22, "condition": "晴れ"}'  # 実際は外部API呼び出し
+
+runner = client.beta.messages.tool_runner(
+    model="claude-opus-4-8",
+    max_tokens=16000,
+    tools=[get_weather],
+    messages=[{"role": "user", "content": "東京の天気を教えて"}],
+)
+
+# 1イテレーション = 1アシスタントターン。ツール呼び出しが尽きたら自動終了
+for message in runner:
+    print(message)
+# ワンショットで最終メッセージだけ欲しいなら runner.until_done()
+```
+
+**手動ループとの使い分け**:
+
+| | 手動ループ（3-2） | Tool Runner |
+|---|---|---|
+| ループ実装 | 自前（`while stop_reason == "tool_use"`） | SDK が管理 |
+| 承認ゲート・介入 | ループ内に自由に書ける | イテレーション毎にメッセージが yield されるので介入可能（ツール関数内でゲート、`generate_tool_call_response()` で結果を検査・改変） |
+| beta 依存 | なし | あり（beta 機能） |
+| 選ぶ場面 | ループ全体を完全に自分で持ちたい・beta を避けたい | それ以外のカスタムツールエージェント全般 |
+
+**注意点**:
+- 非同期は `@beta_async_tool` + `AsyncAnthropic`
+- `stream=True` でストリーミングにも対応、`max_iterations` でループ上限を設定できる
+- **サーバーサイドツール（web_search 等）混在時の `pause_turn` は自動再開されない**——最後のメッセージの `stop_reason` を確認し、必要なら paused ターンを積んでランナーを再作成する
+- MCP ツールを Tool Runner に渡す変換ヘルパーもある（`anthropic.lib.tools.mcp` の `mcp_tool` / `async_mcp_tool`、`pip install anthropic[mcp]`）
+
+> **位置づけ**: Anthropic 公式の「エージェント構築 4 アプローチ」では、①手動ループ ②Tool Runner（どちらも本ノート）③Managed Agents ④Claude Agent SDK（③④は [07](07_Claude_Agent_SDK.md)）という整理。Tool Runner は「ループだけ SDK に任せ、ツールは全部自前」で、組み込みツール（Read/Bash 等）は持たない点が Agent SDK と違う。
+
 ---
 
 ## 4. ストリーミング
@@ -321,6 +373,7 @@ except APIError as e:
 | 基本 messages | 単発の質問・生成 | `stop_reason` で完了確認 |
 | マルチターン | チャットボット | messages 配列を累積 |
 | tool_use ループ | エージェント | `stop_reason == "tool_use"` でループ継続 |
+| Tool Runner | カスタムツールエージェント（推奨） | `client.beta.messages.tool_runner()` + `@beta_tool` |
 | ストリーミング | UXの改善 | `client.messages.stream()` |
 | プロンプトキャッシング | コスト削減 | 変化しない部分に `cache_control` |
 
