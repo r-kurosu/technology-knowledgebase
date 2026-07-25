@@ -87,9 +87,38 @@ Terraformを選ぶ理由は「対応範囲」「エコシステム」の広さ�
 
 CloudFormation、CDK、Terraform、CloudFormation StackSets。
 
+### Terraform × AWS
+
+- `aws` providerがHCLの`resource`ブロックをAWS APIコールに変換する層
+- ECSでいえば`aws_ecs_cluster`／`aws_ecs_task_definition`／`aws_ecs_service`がそれぞれDesired Stateを表す
+- `tfstate`はS3バックエンド（＋ロック用DynamoDB）に置くのが定石。ローカルのままだと紛失・複数人での競合リスクをそのまま抱える
+
+### CloudFormation / CDK
+
+- CloudFormationはAWSネイティブのIaC。YAML/JSONでテンプレートを書き、State相当の情報はAWS側が内部管理してくれる（tfstateを自分で持つ必要がない）
+- CDKはTypeScript/Pythonなどでインフラを書き、裏でCloudFormationテンプレートに変換して実行する（CDK自体はCloudFormationの上に乗っている）
+
+### CloudFormation StackSets
+
+1つのテンプレートを複数のAWSアカウント・複数リージョンに一括デプロイする仕組み。個々のアプリ基盤というより、「全アカウント共通のガードレール（CloudTrail有効化、IAMベースライン等）を組織全体に配る」ようなマルチアカウント統治の文脈で使われる。TerraformやCDKにはこの「複数アカウントへの一括配布」を直接担う標準機能はなく、AWS Organizations連携を前提としたCloudFormation側の強み。
+
 ## 4. アーキテクチャ図
 
-<!-- コード、レビュー、適用、実環境、状態の関係を表す -->
+```mermaid
+graph TD
+    Dev["開発者"] -->|".tfを書く"| Code["Gitリポジトリ<br/>(.tfコード = Desired State)"]
+    Code -->|"Pull Request"| Review["レビュー"]
+    Review -->|"merge"| Pipeline["CI/CDパイプライン"]
+    Pipeline -->|"plan / apply"| TF["Terraform"]
+    TF <-->|"読み書き"| State["tfstate<br/>(S3バックエンド)"]
+    TF -->|"refresh: 現状取得"| AWS["実際のAWSリソース<br/>(Current State)"]
+    TF -->|"差分を適用"| AWS
+    Manual["手動変更<br/>(コンソール等)"] -.->|"Configuration Drift"| AWS
+```
+
+- 開発者が書く`.tf`（Desired State）は、必ずレビューを経てからパイプラインに乗る＝人手の適用経路を作らない
+- Terraformは`tfstate`と実際のAWSリソースの両方を見て差分を計算し、その差分だけをAWSに適用する
+- コンソールなどからの手動変更（点線）は`tfstate`を経由しないため、Drift（ズレ）として後から検出される
 
 ## 5. 設計トレードオフ
 
