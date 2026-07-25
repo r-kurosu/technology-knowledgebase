@@ -122,7 +122,27 @@ graph TD
 
 ## 5. 設計トレードオフ
 
-<!-- 学習コスト、可搬性、状態管理、再利用性、変更影響を考える -->
+### 学習コスト vs 可搬性
+
+| | 学習コスト | 可搬性 |
+|---|---|---|
+| Terraform | HCLという専用言語の習得が必要 | 複数クラウド・SaaSに使い回せる |
+| CloudFormation | AWSの知識だけで完結 | AWS外では使えない |
+| CDK | 普段使う言語（TS/Python等）で書ける分、体感的には低い | 実体はCloudFormation。可搬性はCloudFormationと同じ（AWS専用） |
+
+### 状態管理の所在
+
+- Terraform：自分で`tfstate`を管理する責任を負う（S3+DynamoDBなどの設計が要る）代わりに、他クラウドも同じ仕組みで扱える汎用性を得る
+- CloudFormation/CDK：AWSが状態管理を肩代わりしてくれるが、それはAWS専用が前提だからこそ成り立つ
+
+### 再利用性・変更影響の見え方
+
+- Terraform Module／CDK Construct／CloudFormation Nested Stackはいずれも「まとめて使い回す」仕組みを持つが、StackSetsだけは「複数アカウントへの配布」という別軸の再利用性を持つ
+- Terraformの`plan`はリソース単位の差分を明示的に見せる。CDKはコードは読みやすい一方、実際にAWSで何が起きるかはsynth後のテンプレート/changeset側で確認する必要がある場面もある
+
+### 判断例：汎用性 vs ガバナンス配布
+
+「当面AWS以外を触る予定がなく、全社の複数アカウントに共通ガードレールを配ることが最優先」というケースでは、TerraformよりCloudFormation StackSetsを選ぶ理由が成立する。StackSetsは「AWS専用」という制約を受け入れる代わりに、AWS Organizations連携によるマルチアカウント配布を標準機能として持つ。Terraformで同じことをやろうとすると、配布の仕組み自体を自前で組む必要があり、そのぶんのコストがかかる。**汎用性を捨てる代わりに、ガバナンス配布という専用の強みを買う**トレードオフ。
 
 ## 6. 自分の言葉で説明
 
