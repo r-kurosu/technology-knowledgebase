@@ -52,6 +52,30 @@ Commit → Build → Test → Artifact生成 → (Approval) → Deployを直列�
 
 <!-- CI/CD、継続的Delivery/Deployment、Push/Pull型デプロイを比較する -->
 
+### CI vs Continuous Delivery vs Continuous Deployment
+
+| | CI | Continuous Delivery | Continuous Deployment |
+|---|---|---|---|
+| 自動化される範囲 | Build〜Test | Build〜Test〜デプロイ可能な状態（Artifact）まで | Build〜Test〜本番反映まですべて |
+| 本番反映 | 対象外（統合の話） | 人の承認が必要 | 自動（承認なし） |
+| 目的 | 統合の破綻を早期検出 | 「いつでも出せる」状態を保証しつつ、出すか否かはビジネス判断に委ねる | リリース頻度の最大化、人の介在によるボトルネック排除 |
+| 主なリスク | 本番品質そのものは保証しない | 承認が形骸化するとApproval Theaterになる | 自動テストの信頼性が低いと不良がそのまま本番に届く |
+
+### Push型 vs Pull型デプロイ
+
+- Push型：CI/CDツールが能動的に環境へ書き込む。デプロイイベント発生時のみ更新が走り、その後は誰も監視しない。手動変更などのDriftは次の意図的デプロイまで残り続ける
+- Pull型（GitOps）：環境側のエージェントが自らGit/レジストリの状態を定期的に取りに行き、実際の状態と継続的に比較・是正する。IaCの`plan`/`refresh`サイクルを、人手を介さず自動でループし続けているイメージ
+
+| | Push型 | Pull型（GitOps） |
+|---|---|---|
+| 更新の起点 | CI/CDツールが能動的に環境へ書き込む | 環境側のエージェントが自ら定期的に取りに行く |
+| 実行タイミング | デプロイイベント発生時のみ | 継続的なループ（常時Drift監視） |
+| Driftへの耐性 | 手動変更は次の意図的デプロイまで残る | 次のポーリングで自動的に是正される |
+| 権限の向き | CI/CDツール→環境への書き込み権限が必要 | 環境内エージェントの読み取り権限のみでよい |
+| 代表 | CodePipeline + CodeDeploy(ECS) | ArgoCD, Flux（Kubernetes） |
+
+一般的には、チーム規模が大きくクラスタが分散するほどPull型（GitOps）の「継続的な自己修復」の恩恵が効いてくる。小〜中規模で信頼できる範囲が閉じている場合は、Push型のシンプルさ（追加のエージェント運用が不要）が実務上の妥協点になりやすい。この判断は規模・チーム体制に依存するため、Section 5で自分のユースケースに当てはめて検討する。
+
 ## 3. AWSでの実装例
 
 CodePipeline、CodeBuild、CodeDeploy、ECR、GitHub Actions。
