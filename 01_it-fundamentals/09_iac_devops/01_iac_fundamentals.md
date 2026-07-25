@@ -26,6 +26,29 @@ AWS側のリソースには「Terraformが作った」という印は付いて�
 
 `tfstate`を紛失すると、Terraformは「まだ何も存在しない」と誤認し、既存リソースを再度`CREATE`しようとして名前衝突や重複作成が起きる。復旧には`terraform import`で1つずつ紐付け直しが必要。ローカルではなくS3などリモートバックエンドに置くのは、紛失・競合を避けるため。
 
+### Module
+
+Terraformコードを再利用可能にまとめた部品（関数のようなもの）。「ECSサービス一式」をモジュール化すれば、dev/staging/prodで同じ構成をパラメータだけ変えて使い回せる。コピペ運用は修正漏れ・環境間差異の温床になる。
+
+### Configuration Drift
+
+`tfstate`（Terraformの記憶）に対し、実際のAWSリソースがTerraform経由ではない変更（コンソールでの手動変更など）でずれてしまう状態。次の`plan`の`refresh`で「コードにない差分」として検出される。
+
+**なぜapplyが壊れるか**
+- 単純な値の手動変更（例：desired_count）→ 素直に「コードの値へ戻す」プランになり、大抵は通る
+- immutable（変更不可）な属性を手動変更 → AWS的に削除→再作成が必要になるが、依存関係や一意制約で失敗しうる
+- リソースを手動で削除・再作成 → AWS側のIDが変わり、`tfstate`は古いIDを指したまま。参照時に`ResourceNotFoundException`
+- ECSのタスク定義リビジョンを手動更新 → コンソールは新リビジョン、`tfstate`は古いリビジョンを「正」として記憶したままズレる
+
+**対処**
+- `terraform apply -refresh-only`（またはplan）：コードは変えずtfstateだけ実際のAWSに合わせてから、改めてplanを取る
+- 特定できない場合は`terraform state rm` → `terraform import`でtfstateを作り直す
+- 根本対策：変更経路をTerraform（IaC）に一本化し、緊急時以外はコンソールから直接触らない運用ルール
+
+### 冪等性（Idempotency）
+
+同じ`apply`を何度実行しても結果が同じ状態に収束する性質。差分がなければ何もしない設計になっているため、CI/CDでリトライや再実行があっても安全。`aws cli`で単純に`create`コマンドを並べただけだと、2回実行時にエラーまたは重複作成が起きるのと対照的。
+
 ## 2. 選択肢の比較
 
 <!-- 手作業/IaC、宣言的/命令的、CloudFormation/CDK/Terraformを比較する -->
