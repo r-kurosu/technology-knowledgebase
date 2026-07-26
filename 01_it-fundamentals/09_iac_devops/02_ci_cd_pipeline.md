@@ -100,6 +100,28 @@ GitHub ActionsはAWSに限定されない汎用CI/CDツールという点が、C
 
 <!-- CommitからBuild、Test、Artifact、Deployまでを表す -->
 
+```mermaid
+graph TD
+    Dev["開発者"] -->|"commit"| Branch["devブランチ"]
+    Branch -->|"push"| Build1["CodeBuild<br/>(Build)"]
+    Build1 --> Test1{"Test"}
+    Test1 -->|"fail"| Fail1["パイプライン停止<br/>開発者に通知"]
+    Test1 -->|"pass"| Artifact1["Artifact<br/>(ECRイメージ)"]
+    Artifact1 -->|"Deploy"| DevEnv["dev検証環境ECS"]
+    DevEnv -->|"検証OK→マージ"| Merge["mainブランチ"]
+    Merge -->|"push"| Build2["CodeBuild<br/>(再ビルド)"]
+    Build2 --> Test2{"Test"}
+    Test2 -->|"pass"| Artifact2["Artifact<br/>(別イメージ)"]
+    Artifact2 -->|"承認待ち"| Approve{"手動承認"}
+    Approve -->|"Approve"| Deploy["CodeDeploy"]
+    Deploy --> Prod["本番ECS"]
+    Artifact1 -.->|"本来はこの成果物を<br/>そのまま昇格させたい"| Prod
+```
+
+- devとmainで別々にBuild/Testが走る＝Section1で話した「再ビルド型」。点線はArtifactを使い回す理想形（Build once, deploy many）で、実際のフローとの差分を表している
+- Test失敗時はその場でパイプラインが止まり、後続のArtifact生成・Deployには進まない
+- 手動承認（Approve）はArtifact生成後・本番Deploy前に挟まる。ここが形骸化するとほぼContinuous Deploymentと同じ速度で本番に届いてしまう
+
 ## 5. 設計トレードオフ
 
 <!-- 速度、品質ゲート、承認、並列化、再現性、コストを考える -->
