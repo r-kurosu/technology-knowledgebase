@@ -80,6 +80,22 @@ Commit → Build → Test → Artifact生成 → (Approval) → Deployを直列�
 
 CodePipeline、CodeBuild、CodeDeploy、ECR、GitHub Actions。
 
+### 概念とサービスの対応
+
+| 概念 | サービス | 役割 |
+|---|---|---|
+| Pipeline全体 | CodePipeline | Source→Build→Deployのステージを繋ぐオーケストレーター。自身はビルドもデプロイも実行しない |
+| Build | CodeBuild | `buildspec.yml`に従って実行環境を立ち上げ、ビルドコマンドを実行する |
+| Deploy | CodeDeploy | ECSタスク定義の切り替え、Blue/Greenの切り替えなどを実行する |
+| Artifact保存 | ECR（コンテナイメージ）／S3（CodePipelineの一般的な成果物） | Dockerイメージという特殊なArtifactはECRに保存され、そのイメージURI（タグ/digest）をECSタスク定義に渡す |
+
+### GitHub Actions（AWSネイティブとの対比）
+
+GitHub ActionsはAWSに限定されない汎用CI/CDツールという点が、CodePipelineとの本質的な違い。前述のTerraform（汎用）vs CloudFormation（AWS専用）と同じ構図。
+
+- リポジトリの置き場所自体がトリガー元なので、push/PR/マージにネイティブに反応する（CodePipelineはGitHub連携のために別途CodeStar Connections等が必要）
+- ランナーはAWSアカウントの外側にいるため、AWSへデプロイするには外から中への認証が必要になる。長期のIAMアクセスキーをGitHub Secretsに置くのは漏洩リスクが高く、OIDC連携で一時クレデンシャルを発行するのがベストプラクティス
+
 ## 4. アーキテクチャ図
 
 <!-- CommitからBuild、Test、Artifact、Deployまでを表す -->
