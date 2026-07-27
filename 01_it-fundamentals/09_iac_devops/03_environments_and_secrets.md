@@ -36,19 +36,95 @@ Artifactを環境間で昇格させる流れ。別アカウント構成の場合
 
 ## 2. 選択肢の比較
 
-<!-- 同一/別アカウント、設定/Secret、環境別Build/同一Artifactを比較する -->
+### 同一アカウント vs 別アカウント
+
+| | 同一アカウント | 別アカウント |
+|---|---|---|
+| 分離の実現方法 | IAMポリシーの絞り込み | アカウント境界そのもの |
+| 分離の強さ | ポリシー記述の正確さに依存する | ポリシーの巧拙に依存しないハードな境界（Blast Radiusが限定される） |
+| コスト・クォータ | 環境間で共有（devの負荷がprodのクォータを圧迫しうる） | アカウント単位で独立 |
+| 運用の複雑さ | シンプル（追加の管理コストなし） | Organizations管理、Cross-Account Role設定などの追加運用が必要 |
+| Promotion時の作業 | 不要（同一アカウント内で完結） | Cross-Account IAM Role（AssumeRole）が必要 |
+| 向いている規模 | 個人開発・PoC・小規模 | 組織的な開発、複数チーム、本番運用 |
+
+### 設定値とSecretのストアの使い分け（Parameter Store vs Secrets Manager）
+
+| | Parameter Store | Secrets Manager |
+|---|---|---|
+| 用途 | 非機密設定値、軽量な機密値 | DB認証情報・APIキー等の本格的なSecret |
+| 暗号化 | SecureString型ならKMS暗号化可能（String型は平文） | 常にKMS暗号化 |
+| 自動ローテーション | なし（自前実装） | ネイティブサポート（RDS等と連携） |
+| コスト | 無料〜低コスト | Secret単位で課金（有料） |
+| 判断基準 | ローテーション不要・機密性が低い | ローテーションが必要・機密性が高い |
+
+### 環境別Build vs 同一Artifact（02「Build once, deploy many」との接続）
+
+| | 環境ごとに再ビルド | 同一Artifactを使い回す |
+|---|---|---|
+| 再現性 | devとprodが厳密には別物になりうる | 高い（同じイメージなので一致が保証される） |
+| 環境差分の扱い | ビルド時に埋め込む | 実行時に外部（env/secrets参照）から注入 |
+| Secretとの関係 | ビルド時に埋め込むとイメージ内に残ってしまう（ECRからpull/exportすれば中身が見える＝漏洩リスク） | Secretは実行時参照のみ、イメージには一切残らない |
+
+02では「再現性」の観点で同一Artifactを推す理由を扱ったが、Secretの観点からも「ビルド時埋め込みは危険」という理由が上乗せされる。
 
 ## 3. AWSでの実装例
 
 Organizations、IAM Role、Secrets Manager、Parameter Store、KMS。
 
+### 概念とサービスの対応
+
+| 概念 | サービス | 役割 |
+|---|---|---|
+| アカウント分離の管理 | AWS Organizations | 複数アカウントを一元管理し、SCP（Service Control Policy）で組織全体の権限上限をアカウント横断で設定できる |
+| 環境ごとの権限切り替え | IAM Role | PipelineやECSタスクが環境ごとに異なるRoleを引き受け（AssumeRole）、その環境のリソースだけにアクセスする |
+| 機密性の高いSecret | Secrets Manager | DB認証情報等を暗号化保存し、自動ローテーションに対応 |
+| 非機密〜軽量な機密設定値 | Parameter Store | 環境ごとの設定値をパス階層（`/dev/app/...`、`/prod/app/...`）で管理 |
+| 暗号化の基盤 | KMS | Secrets Manager/Parameter StoreのSecureStringを暗号化するキー管理。Key単位でIAMポリシーによるアクセス制御も可能 |
+
 ## 4. アーキテクチャ図
 
 <!-- Pipelineが権限を切り替えて各環境へ配置する流れを表す -->
 
+```mermaid
+graph TD
+    Pipeline["CI/CDパイプライン"] -->|"AssumeRole(Dev)"| DevRole["Dev用IAM Role"]
+    DevRole --> DevAccount["Devアカウント"]
+    DevAccount --> DevECS["ECSタスク"]
+    DevECS -->|"secrets参照"| DevSecrets["Secrets Manager(Dev)"]
+    DevECS -->|"config参照"| DevParams["Parameter Store(Dev)"]
+
+    Pipeline -->|"承認後 AssumeRole(Prod)"| ProdRole["Prod用IAM Role"]
+    ProdRole --> ProdAccount["Prodアカウント"]
+    ProdAccount --> ProdECS["ECSタスク"]
+    ProdECS -->|"secrets参照"| ProdSecrets["Secrets Manager(Prod)"]
+    ProdECS -->|"config参照"| ProdParams["Parameter Store(Prod)"]
+
+    Artifact["同一Artifact(ECRイメージ)"] -.->|"使い回し"| DevECS
+    Artifact -.->|"使い回し"| ProdECS
+```
+
+Pipelineは環境ごとに別のRoleへスイッチ（AssumeRole）してから、その環境のアカウント内でリソースにアクセスする。同一Artifactは両環境で使い回すが、参照先のSecrets Manager/Parameter Storeはアカウントごとに独立しているため、値の中身は環境間で混ざらない。
+
 ## 5. 設計トレードオフ
 
 <!-- 分離強度、管理負荷、環境差分、Secret露出、監査を考える -->
+
+### 分離強度 vs 管理負荷
+
+| | 分離強度を優先 | 管理負荷を優先 |
+|---|---|---|
+| 選択 | アカウント分離＋個別Role設計 | 同一アカウント＋大まかなIAMポリシー |
+| メリット | Blast Radius最小化、監査が明確 | Organizations運用・Cross-Account Role設定が不要 |
+| デメリット | Organizations運用、Cross-Account Roleの保守コストがかかる | ポリシーの書き漏れが即座に本番へ波及するリスクが残る |
+
+### Secret露出 vs 開発の利便性
+
+| | Secrets Manager徹底 | ローカルの`.env`等 |
+|---|---|---|
+| Secret露出リスク | 低い（参照のみ、アクセス制御・監査あり） | 高い（誤ったgit commit、共有ファイルへの記載などのリスク） |
+| 開発の利便性 | 取得にAPI呼び出しと権限が必要でやや手間 | ローカルで即座に使える |
+
+実務上は「開発時のみローカル`.env`を許容し、そこに本番Secretは絶対に入れない」という線引きが落とし所になりやすい。
 
 ## 6. 自分の言葉で説明
 
