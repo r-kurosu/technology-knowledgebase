@@ -109,7 +109,7 @@ Pipelineは環境ごとに別のRoleへスイッチ（AssumeRole）してから�
 
 ```mermaid
 graph TD
-    Pipeline["CI/CDパイプライン"] -->|"単一Role<br/>(dev/prod両方への権限を保持)"| Role["Pipeline用IAM Role"]
+    Pipeline["CI/CDパイプライン"] --> Role["Pipeline用IAM Role<br/>(dev/prod両方への権限を保持)"]
     Role --> Account["単一AWSアカウント"]
     Account --> DevECS["ECSタスク<br/>(dev-*)"]
     Account --> ProdECS["ECSタスク<br/>(prod-*)"]
