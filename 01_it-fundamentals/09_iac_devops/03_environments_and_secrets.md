@@ -105,6 +105,25 @@ graph TD
 
 Pipelineは環境ごとに別のRoleへスイッチ（AssumeRole）してから、その環境のアカウント内でリソースにアクセスする。同一Artifactは両環境で使い回すが、参照先のSecrets Manager/Parameter Storeはアカウントごとに独立しているため、値の中身は環境間で混ざらない。
 
+### 同一アカウント版（PoC想定）
+
+```mermaid
+graph TD
+    Pipeline["CI/CDパイプライン"] -->|"単一Role<br/>(dev/prod両方への権限を保持)"| Role["Pipeline用IAM Role"]
+    Role --> Account["単一AWSアカウント"]
+    Account --> DevECS["ECSタスク<br/>(dev-*)"]
+    Account --> ProdECS["ECSタスク<br/>(prod-*)"]
+    DevECS -->|"secrets参照"| DevSecrets["Secrets Manager<br/>(dev/app/*)"]
+    DevECS -->|"config参照"| DevParams["Parameter Store<br/>(/dev/app/...)"]
+    ProdECS -->|"secrets参照"| ProdSecrets["Secrets Manager<br/>(prod/app/*)"]
+    ProdECS -->|"config参照"| ProdParams["Parameter Store<br/>(/prod/app/...)"]
+
+    Artifact["同一Artifact(ECRイメージ)"] -.->|"使い回し"| DevECS
+    Artifact -.->|"使い回し"| ProdECS
+```
+
+アカウントを分けない分、環境の区別は「命名規則（`dev-*`/`prod-*`）」と「パス階層（`/dev/...`/`/prod/...`）」だけで行う。AssumeRoleによるアカウント境界の壁がないため、Pipelineが使う単一のRoleが誤って`prod-*`のリソースにも書き込めてしまわないよう、IAMポリシー側でリソースARN・パスプレフィックスを条件指定して絞り込む必要がある。ここが弱点で、Section 2で触れた「同一アカウントは分離強度がポリシー記述の正確さに依存する」がそのまま図に表れている。
+
 ## 5. 設計トレードオフ
 
 <!-- 分離強度、管理負荷、環境差分、Secret露出、監査を考える -->
