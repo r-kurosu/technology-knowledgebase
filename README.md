@@ -27,4 +27,6 @@ ITの基礎知識をMarkdownで体系化した学習ノート。
 3. `01_it-fundamentals/` から始める
 4. Claude Code と対話しながら各ノートを埋めていく
 
+1セッション1ノート、15分目安・最長30分。AIが冒頭で理解度（A/B/C）を判定してセクション7に記録し、対話でセクション1〜5を埋めきる。セクション6・7は自分で書く。
+
 詳細は [`01_it-fundamentals/99_learning_system/`](01_it-fundamentals/99_learning_system/) を参照。
