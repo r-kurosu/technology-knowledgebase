@@ -75,9 +75,29 @@ AWS Batchは裏側で実はECS（EC2またはFargate）上でジョブをコン�
 
 Lambda、AWS Batch、ECS Task、EventBridge、Step Functions。
 
+EventBridgeはイベントの検知とルーティングを担う「入口」で、S3アップロードなどのイベントをルールにマッチさせ、Lambda・Step Functions・ECS Task・AWS Batchなどのターゲットを起動する。Step Functionsは複数ステップ（複数のLambda呼び出しなど）の実行順序・分岐・リトライを管理する「ワークフロー制御」で、EventBridgeのターゲットとしてStep Functions自体を指定し、その中で複数ステップを繋ぐ構成が典型的。
+
+| | EventBridge | Step Functions |
+|---|---|---|
+| 役割 | イベントの検知とルーティング | 複数ステップの実行順序・分岐・リトライ管理 |
+| 典型的な呼び出し先 | Lambda、Step Functions、ECS Task、AWS Batchなど | Lambda、ECS Taskなど複数ステップ |
+
 ## 4. アーキテクチャ図
 
-<!-- イベント発生からFunctionまたはBatch実行までを表す -->
+```mermaid
+graph LR
+    S3["S3<br/>（ファイルアップロード等）"] -->|イベント発生| EB["EventBridge<br/>（ルールでマッチ・ルーティング）"]
+    EB -->|単発処理| L["Lambda<br/>（15分以内・ステートレス）"]
+    EB -->|複数ステップの処理| SF["Step Functions<br/>（ワークフロー制御）"]
+    SF --> L2["Lambda（ステップ1）"]
+    L2 --> L3["Lambda（ステップ2）"]
+    EB -->|長時間バッチ| AB["AWS Batch<br/>（ジョブキュー）"]
+    AB --> ECST["ECS Task（EC2/Fargate）<br/>実行時間上限なし"]
+```
+
+- EventBridgeが「何が起きたか」を検知し、処理の性質によって行き先を振り分ける入口の役割を果たす
+- 単発・短時間ならLambda直接起動、複数ステップに分かれる処理ならStep Functions経由でLambdaを連鎖させる
+- 長時間・大量・可変数のジョブはAWS Batch（裏側はECS Task）が受け持ち、Lambdaの15分制限を回避する
 
 ## 5. 設計トレードオフ
 
