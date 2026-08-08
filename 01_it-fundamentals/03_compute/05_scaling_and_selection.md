@@ -64,7 +64,15 @@ Auto Scalingの発火条件には、指標閾値によるもの（動的スケ�
 
 ## 3. AWSでの実装例
 
-EC2 Auto Scaling、ECS Service Auto Scaling、EKS Autoscaling、Lambda Concurrency、CloudWatch。
+| AWSサービス | 役割 |
+|---|---|
+| CloudWatch | 各リソースの指標（CPU・メモリ・リクエスト数等）を収集、アラームで閾値を監視 |
+| EC2 Auto Scaling | CloudWatchアラームを起点にMin/Max/DesiredでEC2インスタンス数を増減 |
+| ECS Service Auto Scaling | CloudWatchアラームを起点にタスク数を増減 |
+| EKS Autoscaling | 2階層ある：Pod数を増減するHPA（Horizontal Pod Autoscaler）と、Podを置くノード（EC2）自体を増減するCluster Autoscaler/Karpenter |
+| Lambda Concurrency | リクエスト数に応じて自動で並列実行数が増減（ユーザーが閾値設定する対象ではない） |
+
+EKSだけ「Pod数」と「ノード数」の2階層でスケーリングが必要になる点がECSとの運用上の違い（ECSはタスク数の管理のみで、Fargateならノードの概念自体がない）。
 
 ## 4. アーキテクチャ図
 
