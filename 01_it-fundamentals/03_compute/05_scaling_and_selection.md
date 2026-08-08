@@ -32,6 +32,10 @@ EC2 Auto Scaling、ECS Service Auto Scaling、EKS Autoscaling、Lambda Concurren
 
 ワークロードの特徴から実行基盤とスケーリング方式を比較し、判断根拠を説明できる。
 
-### 現在の理解度
+### 理解度ログ
 
+<!-- 「開始」行のみAIが判定して記入。それ以外は自分で書く -->
 <!-- A：説明できる / B：見れば分かる / C：まだ怪しい -->
+
+- 開始 2026-08-08: B（垂直/水平スケールの定義とAuto Scalingの発火条件〔定時・指標閾値〕は即答できた。ステートレス設計との関係やEC2/ECS/EKS/Lambdaの使い分けはこれから）
+- 終了 YYYY-MM-DD:
