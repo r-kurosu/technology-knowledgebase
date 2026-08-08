@@ -76,7 +76,18 @@ EKSだけ「Pod数」と「ノード数」の2階層でスケーリングが必�
 
 ## 4. アーキテクチャ図
 
-<!-- 負荷指標に応じて実行数が増減する流れを表す -->
+```mermaid
+graph LR
+    L["負荷発生<br/>（トラフィック増加）"] -->|CPU/メモリ/リクエスト数等の<br/>メトリクスを送信| CW["CloudWatch<br/>（メトリクス監視）"]
+    CW -->|閾値超えを検知| AL["CloudWatchアラーム"]
+    AL -->|Desiredを更新| AS["Auto Scaling<br/>（EC2 Auto Scaling /<br/>ECS Service Auto Scaling / HPA）"]
+    AS --> R["インスタンス/タスク/Podが増減"]
+
+    L2["リクエスト発生"] -->|都度| LB["Lambda<br/>（CloudWatch経由せず自動で並列実行数が増加）"]
+```
+
+- EC2/ECS/EKSは「メトリクス→アラーム→Auto Scaling→リソース増減」という共通の経路をたどる
+- Lambdaだけこの経路を通らず、リクエストのたびに実行環境が直接並列起動する（ユーザーがスケーリングを設計・監視する対象ではない）
 
 ## 5. 設計トレードオフ
 
