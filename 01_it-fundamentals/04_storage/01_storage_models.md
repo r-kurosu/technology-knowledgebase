@@ -79,15 +79,93 @@ stop / hibernate / terminate 時は、全ブロックが暗号的に消去（cry
 
 ## 3. AWSでの実装例
 
-S3、EBS、EFS、Instance Store、FSx。
+| サービス | モデル | 位置づけ |
+|---|---|---|
+| S3 | オブジェクト | HTTP APIでアクセス。ログ、画像、バックアップ、データレイクの標準的な置き場 |
+| EBS | ブロック | EC2/ECSタスクにアタッチする仮想ディスク。OSブートディスク、DBのデータファイル |
+| EFS | ファイル | NFSv4.1/4.0の共有ファイルシステム。EC2/ECS/EKS/Lambda/Fargateから同時マウント可 |
+| Instance Store | ブロック（一時） | ホスト直結の物理ディスク。キャッシュ・スクラッチ領域専用 |
+| FSx | ファイル | 特定のファイルシステムをマネージドで提供するファミリー |
+
+### FSx ファミリー
+
+EFSがLinux/NFS前提なのに対し、FSxは「別のファイルシステムをそのまま使いたい」ケースを埋める。
+
+- [FSx for Windows File Server](https://docs.aws.amazon.com/fsx/latest/WindowsGuide/what-is.html) — SMB（2.0〜3.1.1）、Active Directory認証、Windows ACL。Windows資産のリフト&シフト用。Single-AZ / Multi-AZ を選べる
+- [FSx for Lustre](https://docs.aws.amazon.com/fsx/latest/LustreGuide/what-is.html) — HPC・機械学習向けの高スループット並列ファイルシステム
+- [FSx for NetApp ONTAP](https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/what-is-fsx-ontap.html) / [FSx for OpenZFS](https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/what-is-fsx.html) — 既存のONTAP/ZFS運用をAWSに持ち込む用途
+
+（対応プロトコルの詳細は各ガイドで要確認。ここで一次情報を確認済みなのはWindows File Serverのみ）
+
+### ECS(Fargate)での実務メモ
+
+Fargateタスクにも **EBSをアタッチできる**（platform version 1.4.0以降、Linuxのみ）が、永続ストレージとしては使えない。
+
+| 制約 | 内容 |
+|---|---|
+| 個数 | 1タスクにつき最大1ボリューム |
+| 既存ボリューム | アタッチ不可（新規のみ。スナップショットからの復元は可） |
+| ライフサイクル | **サービス管理下のタスクでは、タスク終了時に必ず削除される** |
+
+つまりFargate+EBSは「タスク単位のスクラッチ領域」。**複数タスクで共有したい永続データはS3かEFSに置く**、という原則は変わらない。
+出典: [Use Amazon EBS volumes with Amazon ECS](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ebs-volumes.html)
 
 ## 4. アーキテクチャ図
 
-<!-- アプリから各ストレージへアクセスする違いを表す -->
+```mermaid
+graph LR
+    subgraph HOST["EC2ホストマシン"]
+        APP["アプリケーション"]
+        OS["OS / ファイルシステム"]
+        IS[("Instance Store<br/>ホスト直結・一時")]
+        APP --> OS
+        OS -.->|ブロックI/O<br/>ネットワーク不要| IS
+    end
+
+    OS -->|ブロックI/O<br/>ネットワーク越し| EBS[("EBS<br/>1インスタンス専有")]
+    OS -->|NFSマウント| EFS[("EFS<br/>複数から同時マウント")]
+    APP -->|HTTP API<br/>PUT / GET| S3[("S3<br/>オブジェクト丸ごと")]
+
+    OS2["別インスタンスのOS"] -->|NFSマウント| EFS
+    CL["クライアント"] -->|署名付きURL / CloudFront<br/>アプリを経由しない| S3
+```
+
+- **EBS / EFS / Instance Store はOSのファイルI/Oを経由する** — アプリからは「ファイル」に見え、ファイルシステムの存在が前提
+- **S3だけアプリが直接HTTP APIを叩く** — OSのファイルシステムを通らないので、既存のファイル操作コードはそのまま使えない
+- S3はクライアントが**アプリサーバを経由せず**直接取得できる。EFSに置いた場合は必ずアプリ経由の配信になり、その分の帯域とCPUを消費する
 
 ## 5. 設計トレードオフ
 
-<!-- 性能、共有範囲、耐久性、整合性、管理、コストを考える -->
+| 観点 | ブロック（EBS） | ファイル（EFS） | オブジェクト（S3） | 一時（Instance Store） |
+|---|---|---|---|---|
+| 性能 | 低レイテンシ、高IOPS | 中（ネットワーク越しのファイルI/O） | レイテンシ大、スループットは高い | 最速 |
+| 共有範囲 | 原則1インスタンス | 多数から同時 | 無制限 | 1インスタンス（起動中のみ） |
+| 耐久性 | AZ内で複製、インスタンスから独立 | Regionalは複数AZ、One Zoneは単一AZ | 複数AZ | 無し（stop/terminateで消滅） |
+| 整合性 | ローカルディスクと同等 | 強い整合性、ファイルロック対応 | 書き込み後の読み取り整合性あり。ただし部分更新できず丸ごと置換 | ローカルディスクと同等 |
+| 管理 | サイズを事前指定、拡張は手動操作 | 自動伸縮。マウントターゲット・SGの設計が必要 | 容量管理不要。IAM/バケットポリシー設計が中心 | 管理不要（インスタンスタイプに付随） |
+| コスト | プロビジョニング量に課金（未使用分も） | 使用量課金だがGB単価は高め | GB単価は最安クラス、リクエスト課金あり | 追加費用なし（インスタンス料金に込み） |
+
+※ GB単価は改定されるため、比較時は [S3](https://aws.amazon.com/s3/pricing/) / [EFS](https://aws.amazon.com/efs/pricing/) / [EBS](https://aws.amazon.com/ebs/pricing/) の価格ページで都度確認する。
+
+### 判断の順序
+
+1. **部分更新（ランダムライト）が要るか** — 不要ならS3。DBのデータファイルやOSブートディスクは自動的に除外される
+2. **複数サーバから同時に触るか** — 1台専有ならEBS、共有が要るならEFS
+3. **POSIXファイルシステムが前提か** — 既存ソフトがファイルパス・ファイルロックを要求するならEFS（Windows/SMBならFSx）
+4. **消えて困るか** — 困らない一時データ（キャッシュ、スクラッチ）ならInstance Storeで最速かつ無料
+
+### 迷いやすい論点：画像・添付ファイルをS3とEFSのどちらに置くか
+
+判断軸1で決着する（画像は部分更新しないのでS3）が、EFSに引っ張られやすい理由と、それを選ばない根拠を明示しておく。
+
+| | S3 | EFS |
+|---|---|---|
+| 実装のしやすさ | SDK経由。既存のファイル操作コードは書き換えが必要 | ただのファイルパスとして扱えるので既存コードがそのまま動く |
+| 配信経路 | 署名付きURL/CloudFrontでクライアントに直接返せる | アプリサーバ経由でしか配信できず、帯域とCPUを消費する |
+| 運用 | バケットとIAMのみ | マウントターゲット、SG、AZごとの設定が必要 |
+| GB単価 | 安い | 高い |
+
+「実装が楽」の1点だけがEFS有利で、それ以外は全てS3有利。**EFSを選ぶべきなのは、既存ソフトがPOSIXファイルシステムを前提にしていて書き換えられない場合**に限られる。
 
 ## 6. 自分の言葉で説明
 
